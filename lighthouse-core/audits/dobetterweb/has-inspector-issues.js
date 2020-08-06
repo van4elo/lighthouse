@@ -54,6 +54,77 @@ class IssuesPanelEntries extends Audit {
   }
 
   /**
+   * @param {Array<LH.Crdp.Audits.MixedContentIssueDetails>} mixedContentIssues
+   * @return {Array<any>}
+   */
+  static getMixedContentItems(mixedContentIssues) {
+    if (!mixedContentIssues) {
+      return [];
+    }
+
+    return mixedContentIssues.map(issue => {
+
+    });
+  }
+
+  /**
+   * @param {Array<LH.Crdp.Audits.SameSiteCookieIssueDetails>} sameSiteCookieIssues
+   * @return {Array<any>}
+   */
+  static getSameSiteCookieItems(sameSiteCookieIssues) {
+    if (!sameSiteCookieIssues) {
+      return [];
+    }
+
+    return sameSiteCookieIssues.map(issue => {
+      
+    });
+  }
+
+  /**
+   * @param {Array<LH.Crdp.Audits.BlockedByResponseIssueDetails>} blockedByResponseIssues
+   * @return {Array<any>}
+   */
+  static getBlockedByResponseItems(blockedByResponseIssues) {
+    if (!blockedByResponseIssues) {
+      return [];
+    }
+
+    return blockedByResponseIssues.map(issue => {
+      const blockedReason = issue.reason;
+      
+    });
+  }
+
+  /**
+   * @param {Array<LH.Crdp.Audits.HeavyAdIssueDetails>} heavyAdsIssues
+   * @return {Array<any>}
+   */
+  static getHeavyAdsItems(heavyAdsIssues) {
+    if (!heavyAdsIssues) {
+      return [];
+    }
+
+    return heavyAdsIssues.map(issue => {
+      
+    });
+  }
+
+  /**
+   * @param {Array<LH.Crdp.Audits.ContentSecurityPolicyIssueDetails>} cspIssues
+   * @return {Array<any>}
+   */
+  static getContentSecurityPolicyItems(cspIssues) {
+    if (!cspIssues) {
+      return [];
+    }
+
+    return cspIssues.map(issue => {
+      
+    });
+  }
+
+  /**
    * @param {LH.Artifacts} artifacts
    * @return {LH.Audit.Product}
    */
