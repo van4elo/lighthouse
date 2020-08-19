@@ -824,6 +824,21 @@
   "lighthouse-core/audits/is-on-https.js | warning": {
     "message": "Âĺl̂óŵéd̂ ẃît́ĥ ẃâŕn̂ín̂ǵ"
   },
+  "lighthouse-core/audits/large-javascript-libraries.js | columnLibraryName": {
+    "message": "L̂íb̂ŕâŕŷ"
+  },
+  "lighthouse-core/audits/large-javascript-libraries.js | description": {
+    "message": "L̂ár̂ǵê J́âv́âŚĉŕîṕt̂ ĺîb́r̂ár̂íêś ĉán̂ ĺêád̂ t́ô ṕôór̂ ṕêŕf̂ór̂ḿâńĉé. P̂ŕêf́êŕ ŝḿâĺl̂ér̂, f́ûńĉt́îón̂ál̂ĺŷ éq̂úîv́âĺêńt̂ ĺîb́r̂ár̂íêś t̂ó r̂éd̂úĉé ŷóûŕ b̂ún̂d́l̂é ŝíẑé. [L̂éâŕn̂ ḿôŕê](https://developers.google.com/web/fundamentals/performance/webpack/decrease-frontend-size#optimize_dependencies)."
+  },
+  "lighthouse-core/audits/large-javascript-libraries.js | displayValue": {
+    "message": "{libraryCount, plural,\n    =1 {1 l̂ár̂ǵê ĺîb́r̂ár̂ý f̂óûńd̂}\n    other {# ĺâŕĝé l̂íb̂ŕâŕîéŝ f́ôún̂d́}\n    }"
+  },
+  "lighthouse-core/audits/large-javascript-libraries.js | failureTitle": {
+    "message": "R̂ép̂ĺâćê ún̂ńêćêśŝár̂íl̂ý l̂ár̂ǵê J́âv́âŚĉŕîṕt̂ ĺîb́r̂ár̂íêś"
+  },
+  "lighthouse-core/audits/large-javascript-libraries.js | title": {
+    "message": "Âv́ôíd̂ś l̂ár̂ǵê J́âv́âŚĉŕîṕt̂ ĺîb́r̂ár̂íêś ŵít̂h́ ŝḿâĺl̂ér̂ ál̂t́êŕn̂át̂ív̂éŝ"
+  },
   "lighthouse-core/audits/largest-contentful-paint-element.js | description": {
     "message": "T̂h́îś îś t̂h́ê ĺâŕĝéŝt́ ĉón̂t́êńt̂f́ûĺ êĺêḿêńt̂ ṕâín̂t́êd́ ŵít̂h́îń t̂h́ê v́îéŵṕôŕt̂. [Ĺêár̂ń M̂ór̂é](https://web.dev/lighthouse-largest-contentful-paint/)"
   },
@@ -968,11 +983,26 @@
   "lighthouse-core/audits/non-composited-animations.js | displayValue": {
     "message": "{itemCount, plural,\n  =1 {# âńîḿât́êd́ êĺêḿêńt̂ f́ôún̂d́}\n  other {# âńîḿât́êd́ êĺêḿêńt̂ś f̂óûńd̂}\n  }"
   },
+  "lighthouse-core/audits/non-composited-animations.js | filterMayMovePixels": {
+    "message": "F̂íl̂t́êŕ-r̂él̂át̂éd̂ ṕr̂óp̂ér̂t́ŷ ḿâý m̂óv̂é p̂íx̂él̂ś"
+  },
+  "lighthouse-core/audits/non-composited-animations.js | incompatibleAnimations": {
+    "message": "T̂ár̂ǵêt́ ĥáŝ án̂ót̂h́êŕ âńîḿât́îón̂ ẃĥíĉh́ îś îńĉóm̂ṕât́îb́l̂é"
+  },
+  "lighthouse-core/audits/non-composited-animations.js | nonReplaceCompositeMode": {
+    "message": "Êf́f̂éĉt́ ĥáŝ ćôḿp̂óŝít̂é m̂ód̂é ôt́ĥér̂ t́ĥán̂ \"ŕêṕl̂áĉé\""
+  },
   "lighthouse-core/audits/non-composited-animations.js | title": {
     "message": "Âv́ôíd̂ ńôń-ĉóm̂ṕôśît́êd́ âńîḿât́îón̂ś"
   },
+  "lighthouse-core/audits/non-composited-animations.js | transformDependsBoxSize": {
+    "message": "T̂ŕâńŝf́ôŕm̂-ŕêĺât́êd́ p̂ŕôṕêŕt̂ý d̂ép̂én̂d́ŝ ón̂ b́ôx́ ŝíẑé"
+  },
   "lighthouse-core/audits/non-composited-animations.js | unsupportedCSSProperty": {
-    "message": "Ûńŝúp̂ṕôŕt̂éd̂ ĆŜŚ P̂ŕôṕêŕt̂ý"
+    "message": "{propertyCount, plural,\n    =1 {Ûńŝúp̂ṕôŕt̂éd̂ ĆŜŚ P̂ŕôṕêŕt̂ý: {properties}}\n    other {Ûńŝúp̂ṕôŕt̂éd̂ ĆŜŚ P̂ŕôṕêŕt̂íêś: {properties}}\n  }"
+  },
+  "lighthouse-core/audits/non-composited-animations.js | unsupportedTimingParameters": {
+    "message": "Êf́f̂éĉt́ ĥáŝ ún̂śûṕp̂ór̂t́êd́ t̂ím̂ín̂ǵ p̂ár̂ám̂ét̂ér̂ś"
   },
   "lighthouse-core/audits/offline-start-url.js | description": {
     "message": "Â śêŕv̂íĉé ŵór̂ḱêŕ êńâb́l̂éŝ ýôúr̂ ẃêb́ âṕp̂ t́ô b́ê ŕêĺîáb̂ĺê ín̂ ún̂ṕr̂éd̂íĉt́âb́l̂é n̂ét̂ẃôŕk̂ ćôńd̂ít̂íôńŝ. [Ĺêár̂ń m̂ór̂é](https://web.dev/offline-start-url/)."
