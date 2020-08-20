@@ -29,6 +29,7 @@ describe('Lazy load third party resources', () => {
     const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results.score).toBe(0);
+    expect(results.displayValue).toBeDisplayString('1 facade alternative available');
     expect(results.details.items).toEqual([
       {
         facade: {
