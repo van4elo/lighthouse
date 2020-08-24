@@ -15,6 +15,7 @@ const config = {
   extends: 'lighthouse:default',
   audits: [
     'full-page-screenshot',
+    'lazy-third-party',
   ],
   passes: [{
     passName: 'defaultPass',
@@ -22,6 +23,15 @@ const config = {
       'full-page-screenshot',
     ],
   }],
+  categories: {
+    // @ts-ignore: `title` is required in CategoryJson. setting to the same value as the default
+    // config is awkward - easier to omit the property here. Will defer to default config.
+    'performance': {
+      auditRefs: [
+        {id: 'lazy-third-party', weight: 0, group: 'diagnostics'},
+      ],
+    },
+  },
 };
 
 module.exports = config;
