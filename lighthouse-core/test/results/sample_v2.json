@@ -1702,8 +1702,8 @@
             "mainThreadTime": 90.36300000000001,
             "blockingTime": 22.918000000000006,
             "transferSize": 30174,
-            "startTime": null,
-            "endTime": 0,
+            "startTime": 4808.602,
+            "endTime": 185608.117509,
             "entity": {
               "type": "link",
               "text": "Google CDN",
@@ -1717,7 +1717,7 @@
                   "mainThreadTime": 90.36300000000001,
                   "blockingTime": 22.918000000000006,
                   "transferSize": 30174,
-                  "startTime": 185607.195975,
+                  "startTime": 4808.602,
                   "endTime": 185608.117509
                 }
               ]
