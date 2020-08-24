@@ -36,9 +36,9 @@ const UIStrings = {
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
-/** @typedef {import("third-party-web").IFacade} ThirdPartyFacade */
+/** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
 
-/** @typedef {{facade: ThirdPartyFacade, cutoffTime: number, urlSummaries: Map<string, ThirdPartySummary.Summary>}} FacadeSummary */
+/** @typedef {{product: ThirdPartyProduct, cutoffTime: number, urlSummaries: Map<string, ThirdPartySummary.Summary>}} ProductSummary */
 
 class LazyThirdParty extends Audit {
   /**
@@ -57,49 +57,49 @@ class LazyThirdParty extends Audit {
   /**
    * @param {Map<string, ThirdPartySummary.Summary>} byURL
    * @param {ThirdPartyEntity | undefined} mainEntity
-   * @return {FacadeSummary[]}
+   * @return {ProductSummary[]}
    */
-  static getFacadeSummaries(byURL, mainEntity) {
-    /** @type {Map<string, Map<string, FacadeSummary>>} */
+  static getProductSummaries(byURL, mainEntity) {
+    /** @type {Map<string, Map<string, ProductSummary>>} */
     const entitySummaries = new Map();
 
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
-      const facade = thirdPartyWeb.getFirstFacade(url);
+      const product = thirdPartyWeb.getProduct(url);
       if (!entity || mainEntity && entity.name === mainEntity.name) continue;
 
-      /** @type {Map<string, FacadeSummary>} */
-      const facadeSummaries = entitySummaries.get(entity.name) || new Map();
-      if (facade) {
-        // Record new facades if the url has one
-        const facadeSummary = facadeSummaries.get(facade.name) || {
-          facade,
+      /** @type {Map<string, ProductSummary>} */
+      const productSummaries = entitySummaries.get(entity.name) || new Map();
+      if (product && product.facades && product.facades.length) {
+        // Record new url if product has a facade
+        const productSummary = productSummaries.get(product.name) || {
+          product,
           cutoffTime: Infinity,
           urlSummaries: new Map(),
         };
 
-        facadeSummary.urlSummaries.set(url, urlSummary);
-        facadeSummary.cutoffTime = Math.min(facadeSummary.cutoffTime, urlSummary.endTime);
+        productSummary.urlSummaries.set(url, urlSummary);
+        productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.endTime);
 
-        facadeSummaries.set(facade.name, facadeSummary);
+        productSummaries.set(product.name, productSummary);
       } else {
-        // If the url does not have a facade but its entity does, add this url to any facade summaries
-        // for resources fetched before this one.
-        for (const facadeSummary of facadeSummaries.values()) {
-          if (urlSummary.startTime < facadeSummary.cutoffTime) continue;
-          facadeSummary.urlSummaries.set(url, urlSummary);
+        // If the url does not have a facade but one or more products on its entity do,
+        // we still want to record this url because it was probably fetched by a product with a facade.
+        for (const productSummary of productSummaries.values()) {
+          if (urlSummary.startTime < productSummary.cutoffTime) continue;
+          productSummary.urlSummaries.set(url, urlSummary);
         }
       }
-      entitySummaries.set(entity.name, facadeSummaries);
+      entitySummaries.set(entity.name, productSummaries);
     }
 
-    const allFacadeSummaries = [];
-    for (const facadeSummaries of entitySummaries.values()) {
-      for (const facadeSummary of facadeSummaries.values()) {
-        allFacadeSummaries.push(facadeSummary);
+    const allProductSummaries = [];
+    for (const productSummaries of entitySummaries.values()) {
+      for (const productSummary of productSummaries.values()) {
+        allProductSummaries.push(productSummary);
       }
     }
-    return allFacadeSummaries;
+    return allProductSummaries;
   }
 
   /**
@@ -118,30 +118,44 @@ class LazyThirdParty extends Audit {
     const multiplier = settings.throttlingMethod === 'simulate' ?
       settings.throttling.cpuSlowdownMultiplier : 1;
     const {byURL} = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
-    const facadeSummaries = LazyThirdParty.getFacadeSummaries(byURL, mainEntity);
+    const productSummaries = LazyThirdParty.getProductSummaries(byURL, mainEntity);
 
     const summary = {wastedBytes: 0, wastedMs: 0};
 
     /** @type LH.Audit.Details.TableItem[] */
-    const results = Array.from(facadeSummaries)
-      .map((facadeSummary) => {
-        /** @type LH.Audit.Details.TableItem[] */
-        const items = [];
-        for (const [url, urlStats] of Array.from(facadeSummary.urlSummaries)) {
-          const product = thirdPartyWeb.getProduct(url) || {name: ''};
-          items.push({url, productName: product.name, ...urlStats});
-          summary.wastedBytes += urlStats.transferSize;
-          summary.wastedMs += urlStats.blockingTime;
-        }
-        return {
-          facade: /** @type {LH.Audit.Details.LinkValue} */ {
-            type: 'link',
-            text: facadeSummary.facade.name,
-            url: facadeSummary.facade.repo,
-          },
-          subItems: {type: 'subitems', items},
-        };
+    const results = [];
+    for (const productSummary of productSummaries) {
+      const product = productSummary.product;
+      if (!product.facades || !product.facades.length) continue;
+
+      // The first facade should always be the best one
+      const bestFacade = product.facades[0];
+
+      const items = [];
+      let transferSize = 0;
+      let blockingTime = 0;
+      for (const [url, urlStats] of Array.from(productSummary.urlSummaries)) {
+        items.push({url, ...urlStats});
+        transferSize += urlStats.transferSize;
+        blockingTime += urlStats.blockingTime;
+      }
+      items.sort((firstEl, secondEl) => {
+        return secondEl.transferSize - firstEl.transferSize;
       });
+      summary.wastedBytes += transferSize;
+      summary.wastedMs += blockingTime;
+      results.push({
+        productName: product.name,
+        facade: /** @type {LH.Audit.Details.LinkValue} */ {
+          type: 'link',
+          text: bestFacade.name,
+          url: bestFacade.repo,
+        },
+        transferSize,
+        blockingTime,
+        subItems: {type: 'subitems', items},
+      });
+    }
 
     if (!results.length) {
       return {
@@ -152,13 +166,12 @@ class LazyThirdParty extends Audit {
 
     /** @type {LH.Audit.Details.Table['headings']} */
     const headings = [
-      {key: 'facade', itemType: 'link', text: str_(UIStrings.columnFacade),
+      {key: 'productName', itemType: 'text', text: str_(UIStrings.columnProduct),
         subItemsHeading: {key: 'url', itemType: 'url'}},
-      {key: null, itemType: 'text', text: str_(UIStrings.columnProduct),
-        subItemsHeading: {key: 'productName'}},
-      {key: null, granularity: 1, itemType: 'bytes',
+      {key: 'facade', itemType: 'link', text: str_(UIStrings.columnFacade)},
+      {key: 'transferSize', granularity: 1, itemType: 'bytes',
         text: str_(i18n.UIStrings.columnTransferSize), subItemsHeading: {key: 'transferSize'}},
-      {key: null, granularity: 1, itemType: 'ms',
+      {key: 'blockingTime', granularity: 1, itemType: 'ms',
         text: str_(i18n.UIStrings.columnBlockingTime), subItemsHeading: {key: 'blockingTime'}},
     ];
 

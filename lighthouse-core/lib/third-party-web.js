@@ -38,17 +38,6 @@ function getProduct(url) {
 }
 
 /**
- * The first facade should always be the best one.
- * @param {string} url
- * @return {ThirdPartyFacade|undefined}
- */
-function getFirstFacade(url) {
-  const product = getProduct(url);
-  if (!product || !product.facades || !product.facades.length) return undefined;
-  return product.facades[0];
-}
-
-/**
  * @param {string} url
  * @param {ThirdPartyEntity | undefined} mainDocumentEntity
  */
@@ -70,7 +59,6 @@ function isFirstParty(url, mainDocumentEntity) {
 module.exports = {
   getEntity,
   getProduct,
-  getFirstFacade,
   isThirdParty,
   isFirstParty,
 };

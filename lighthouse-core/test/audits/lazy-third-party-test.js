@@ -18,8 +18,24 @@ describe('Lazy load third party resources', () => {
   it('correctly identifies a lazy loadable third party resource', async () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
-        {url: 'https://example.com'},
-        {url: 'https://widget.intercom.io/widget/tx2p130c'},
+        {
+          url: 'https://example.com',
+          startTime: 0,
+          endTime: 50,
+          transferSize: 2000,
+        },
+        {
+          url: 'https://widget.intercom.io/widget/tx2p130c',
+          startTime: 100,
+          endTime: 150,
+          transferSize: 4000,
+        },
+        {
+          url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
+          startTime: 200,
+          endTime: 250,
+          transferSize: 8000,
+        },
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
       URL: {finalUrl: 'https://example.com'},
@@ -32,18 +48,30 @@ describe('Lazy load third party resources', () => {
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
     expect(results.details.items).toEqual([
       {
+        productName: 'Intercom Widget',
         facade: {
           type: 'link',
           text: 'React Live Chat Loader',
           url: 'https://github.com/calibreapp/react-live-chat-loader',
         },
+        transferSize: 12000,
+        blockingTime: 0,
         subItems: {type: 'subitems', items: [
           {
-            url: 'https://widget.intercom.io/widget/tx2p130c',
-            productName: 'Intercom Widget',
+            url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
             mainThreadTime: 0,
             blockingTime: 0,
-            transferSize: 0,
+            transferSize: 8000,
+            startTime: 200,
+            endTime: 250,
+          },
+          {
+            url: 'https://widget.intercom.io/widget/tx2p130c',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 4000,
+            startTime: 100,
+            endTime: 150,
           },
         ]},
       },
