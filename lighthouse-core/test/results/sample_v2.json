@@ -1907,7 +1907,7 @@
     "non-composited-animations": {
       "id": "non-composited-animations",
       "title": "Avoid non-composited animations",
-      "description": "Animations which are not composited can be janky and contribute to CLS. [Learn more](https://developers.google.com/web/fundamentals/performance/rendering/stick-to-compositor-only-properties-and-manage-layer-count)",
+      "description": "Animations which are not composited can be janky and increase CLS. [Learn more](https://web.dev/non-composited-animations)",
       "score": null,
       "scoreDisplayMode": "informative",
       "displayValue": "1 animated element found",
@@ -6936,12 +6936,18 @@
       "lighthouse-core/audits/largest-contentful-paint-element.js | description": [
         "audits[largest-contentful-paint-element].description"
       ],
-      "lighthouse-core/audits/largest-contentful-paint-element.js | displayValue": [
+      "lighthouse-core/lib/i18n/i18n.js | displayValueElementsFound": [
         {
           "values": {
-            "itemCount": 1
+            "nodeCount": 1
           },
           "path": "audits[largest-contentful-paint-element].displayValue"
+        },
+        {
+          "values": {
+            "nodeCount": 4
+          },
+          "path": "audits[layout-shift-elements].displayValue"
         }
       ],
       "lighthouse-core/lib/i18n/i18n.js | columnElement": [
@@ -6955,14 +6961,6 @@
       ],
       "lighthouse-core/audits/layout-shift-elements.js | description": [
         "audits[layout-shift-elements].description"
-      ],
-      "lighthouse-core/audits/layout-shift-elements.js | displayValue": [
-        {
-          "values": {
-            "nodeCount": 4
-          },
-          "path": "audits[layout-shift-elements].displayValue"
-        }
       ],
       "lighthouse-core/audits/layout-shift-elements.js | columnContribution": [
         "audits[layout-shift-elements].details.headings[1].text"

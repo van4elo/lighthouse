@@ -14,6 +14,7 @@
 const config = {
   extends: 'lighthouse:default',
   audits: [
+    'autocomplete',
     'full-page-screenshot',
     'lazy-third-party',
   ],
@@ -29,6 +30,13 @@ const config = {
     'performance': {
       auditRefs: [
         {id: 'lazy-third-party', weight: 0, group: 'diagnostics'},
+      ],
+    },
+    // @ts-ignore: `title` is required in CategoryJson. setting to the same value as the default
+    // config is awkward - easier to omit the property here. Will defer to default config.
+    'best-practices': {
+      auditRefs: [
+        {id: 'autocomplete', weight: 0, group: 'best-practices-ux'},
       ],
     },
   },
