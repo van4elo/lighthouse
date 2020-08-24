@@ -43,6 +43,8 @@ const PASS_THRESHOLD_IN_MS = 250;
  *   mainThreadTime: number,
  *   transferSize: number,
  *   blockingTime: number,
+ *   startTime: number,
+ *   endTime: number,
  * }} Summary
  */
 
@@ -90,11 +92,19 @@ class ThirdPartySummary extends Audit {
     const byURL = new Map();
     /** @type {Map<ThirdPartyEntity, Summary>} */
     const byEntity = new Map();
-    const defaultSummary = {mainThreadTime: 0, blockingTime: 0, transferSize: 0};
+    const defaultSummary = {
+      mainThreadTime: 0,
+      blockingTime: 0,
+      transferSize: 0,
+      startTime: Infinity,
+      endTime: 0,
+    };
 
     for (const request of networkRecords) {
       const urlSummary = byURL.get(request.url) || {...defaultSummary};
       urlSummary.transferSize += request.transferSize;
+      urlSummary.startTime = Math.min(urlSummary.startTime, request.startTime);
+      urlSummary.endTime = Math.max(urlSummary.endTime, request.endTime);
       byURL.set(request.url, urlSummary);
     }
 

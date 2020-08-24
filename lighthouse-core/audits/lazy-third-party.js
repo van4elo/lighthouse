@@ -38,7 +38,7 @@ const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 /** @typedef {import("third-party-web").IFacade} ThirdPartyFacade */
 
-/** @typedef {{facade: ThirdPartyFacade, urlSummaries: Map<string, ThirdPartySummary.Summary>}} FacadeSummary */
+/** @typedef {{facade: ThirdPartyFacade, cutoffTime: number, urlSummaries: Map<string, ThirdPartySummary.Summary>}} FacadeSummary */
 
 class LazyThirdParty extends Audit {
   /**
@@ -57,23 +57,49 @@ class LazyThirdParty extends Audit {
   /**
    * @param {Map<string, ThirdPartySummary.Summary>} byURL
    * @param {ThirdPartyEntity | undefined} mainEntity
-   * @return {Map<string, FacadeSummary>}
+   * @return {FacadeSummary[]}
    */
   static getFacadeSummaries(byURL, mainEntity) {
-    /** @type {Map<string, FacadeSummary>} */
-    const facadeSummaries = new Map();
+    /** @type {Map<string, Map<string, FacadeSummary>>} */
+    const entitySummaries = new Map();
 
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
       const facade = thirdPartyWeb.getFirstFacade(url);
-      if (!facade || !entity || mainEntity && entity.name === mainEntity.name) continue;
+      if (!entity || mainEntity && entity.name === mainEntity.name) continue;
 
-      const facadeSummary = facadeSummaries.get(facade.name) || {facade, urlSummaries: new Map()};
-      facadeSummary.urlSummaries.set(url, urlSummary);
-      facadeSummaries.set(facade.name, facadeSummary);
+      /** @type {Map<string, FacadeSummary>} */
+      const facadeSummaries = entitySummaries.get(entity.name) || new Map();
+      if (facade) {
+        // Record new facades if the url has one
+        const facadeSummary = facadeSummaries.get(facade.name) || {
+          facade,
+          cutoffTime: Infinity,
+          urlSummaries: new Map(),
+        };
+
+        facadeSummary.urlSummaries.set(url, urlSummary);
+        facadeSummary.cutoffTime = Math.min(facadeSummary.cutoffTime, urlSummary.endTime);
+
+        facadeSummaries.set(facade.name, facadeSummary);
+      } else {
+        // If the url does not have a facade but its entity does, add this url to any facade summaries
+        // for resources fetched before this one.
+        for (const facadeSummary of facadeSummaries.values()) {
+          if (urlSummary.startTime < facadeSummary.cutoffTime) continue;
+          facadeSummary.urlSummaries.set(url, urlSummary);
+        }
+      }
+      entitySummaries.set(entity.name, facadeSummaries);
     }
 
-    return facadeSummaries;
+    const allFacadeSummaries = [];
+    for (const facadeSummaries of entitySummaries.values()) {
+      for (const facadeSummary of facadeSummaries.values()) {
+        allFacadeSummaries.push(facadeSummary);
+      }
+    }
+    return allFacadeSummaries;
   }
 
   /**
@@ -98,7 +124,7 @@ class LazyThirdParty extends Audit {
 
     /** @type LH.Audit.Details.TableItem[] */
     const results = Array.from(facadeSummaries)
-      .map(([name, facadeSummary]) => {
+      .map((facadeSummary) => {
         /** @type LH.Audit.Details.TableItem[] */
         const items = [];
         for (const [url, urlStats] of Array.from(facadeSummary.urlSummaries)) {
@@ -110,7 +136,7 @@ class LazyThirdParty extends Audit {
         return {
           facade: /** @type {LH.Audit.Details.LinkValue} */ {
             type: 'link',
-            text: name,
+            text: facadeSummary.facade.name,
             url: facadeSummary.facade.repo,
           },
           subItems: {type: 'subitems', items},
