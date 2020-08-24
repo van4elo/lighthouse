@@ -9,7 +9,6 @@ const thirdPartyWeb = require('third-party-web/httparchive-nostats-subset');
 
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 /** @typedef {import("third-party-web").IProduct} ThirdPartyProduct */
-/** @typedef {import("third-party-web").IFacade} ThirdPartyFacade */
 
 /**
  * `third-party-web` throws when the passed in string doesn't appear to have any domain whatsoever.
