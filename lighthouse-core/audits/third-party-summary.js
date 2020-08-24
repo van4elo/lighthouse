@@ -115,6 +115,8 @@ class ThirdPartySummary extends Audit {
 
       const urlSummary = byURL.get(attributableURL) || {...defaultSummary};
       const taskDuration = task.selfTime * cpuMultiplier;
+      urlSummary.startTime = Math.min(urlSummary.startTime, task.startTime);
+      urlSummary.endTime = Math.max(urlSummary.endTime, task.endTime);
       // The amount of time spent on main thread is the sum of all durations.
       urlSummary.mainThreadTime += taskDuration;
       // The amount of time spent *blocking* on main thread is the sum of all time longer than 50ms.
@@ -138,6 +140,8 @@ class ThirdPartySummary extends Audit {
       entitySummary.transferSize += urlSummary.transferSize;
       entitySummary.mainThreadTime += urlSummary.mainThreadTime;
       entitySummary.blockingTime += urlSummary.blockingTime;
+      entitySummary.startTime = Math.min(entitySummary.startTime, urlSummary.startTime);
+      entitySummary.endTime = Math.max(entitySummary.endTime, urlSummary.endTime);
       byEntity.set(entity, entitySummary);
 
       const entityURLs = urls.get(entity) || [];
