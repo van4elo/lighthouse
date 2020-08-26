@@ -151,6 +151,9 @@ Object {
       "path": "third-party-summary",
     },
     Object {
+      "path": "lazy-third-party",
+    },
+    Object {
       "path": "largest-contentful-paint-element",
     },
     Object {
@@ -991,6 +994,11 @@ Object {
         Object {
           "group": "diagnostics",
           "id": "third-party-summary",
+          "weight": 0,
+        },
+        Object {
+          "group": "diagnostics",
+          "id": "lazy-third-party",
           "weight": 0,
         },
         Object {
