@@ -1702,7 +1702,7 @@
             "mainThreadTime": 90.36300000000001,
             "blockingTime": 22.918000000000006,
             "transferSize": 30174,
-            "startTime": 4808.602,
+            "startTime": 185607.195975,
             "endTime": 185608.117509,
             "entity": {
               "type": "link",
@@ -1717,7 +1717,7 @@
                   "mainThreadTime": 90.36300000000001,
                   "blockingTime": 22.918000000000006,
                   "transferSize": 30174,
-                  "startTime": 4808.602,
+                  "startTime": 185607.195975,
                   "endTime": 185608.117509
                 }
               ]
@@ -1729,6 +1729,13 @@
           "wastedMs": 22.918000000000006
         }
       }
+    },
+    "lazy-third-party": {
+      "id": "lazy-third-party",
+      "title": "Lazy load third-party resources",
+      "description": "Some third-party resources can be fetched after the page loads. These third-party resources are used by embedded elements which can be replaced by a facade until the user needs to use them. [Learn more](https://web.dev/efficiently-load-third-party-javascript/).",
+      "score": null,
+      "scoreDisplayMode": "notApplicable"
     },
     "largest-contentful-paint-element": {
       "id": "largest-contentful-paint-element",
@@ -4456,6 +4463,11 @@
           "group": "diagnostics"
         },
         {
+          "id": "lazy-third-party",
+          "weight": 0,
+          "group": "diagnostics"
+        },
+        {
           "id": "largest-contentful-paint-element",
           "weight": 0,
           "group": "diagnostics"
@@ -5644,6 +5656,12 @@
       {
         "startTime": 0,
         "name": "lh:audit:third-party-summary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:audit:lazy-third-party",
         "duration": 100,
         "entryType": "measure"
       },
@@ -6909,6 +6927,12 @@
       ],
       "lighthouse-core/lib/i18n/i18n.js | columnBlockingTime": [
         "audits[third-party-summary].details.headings[2].text"
+      ],
+      "lighthouse-core/audits/lazy-third-party.js | title": [
+        "audits[lazy-third-party].title"
+      ],
+      "lighthouse-core/audits/lazy-third-party.js | description": [
+        "audits[lazy-third-party].description"
       ],
       "lighthouse-core/audits/largest-contentful-paint-element.js | title": [
         "audits[largest-contentful-paint-element].title"
