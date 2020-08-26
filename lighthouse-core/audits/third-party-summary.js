@@ -115,8 +115,6 @@ class ThirdPartySummary extends Audit {
 
       const urlSummary = byURL.get(attributableURL) || {...defaultSummary};
       const taskDuration = task.selfTime * cpuMultiplier;
-      urlSummary.startTime = Math.min(urlSummary.startTime, task.startTime);
-      urlSummary.endTime = Math.max(urlSummary.endTime, task.endTime);
       // The amount of time spent on main thread is the sum of all durations.
       urlSummary.mainThreadTime += taskDuration;
       // The amount of time spent *blocking* on main thread is the sum of all time longer than 50ms.
