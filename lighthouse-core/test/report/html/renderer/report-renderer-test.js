@@ -193,14 +193,14 @@ describe('ReportRenderer', () => {
 
     it('renders links in the warning section', () => {
       const warningResults = Object.assign({}, sampleResults, {
-        runWarnings: ['[I am a link](https://web.dev)'],
+        runWarnings: ['[I am a link](https://example.com/)'],
       });
       const container = renderer._dom._document.body;
       const output = renderer.renderReport(warningResults, container);
 
-      const warningEls = output.querySelectorAll('.lh-warnings--toplevel > ul > li > a');
+      const warningEls = output.querySelectorAll('.lh-warnings--toplevel ul li a');
       expect(warningEls).toHaveLength(1);
-      expect(warningEls[0].href).toEqual('https://web.dev');
+      expect(warningEls[0].href).toEqual('https://example.com/');
     });
 
     it('renders a footer', () => {
