@@ -70,6 +70,9 @@ function runA11yChecks() {
           node.boundingRect = rect;
         }
 
+        window.__nodes = window.__nodes || [];
+        window.__nodes.push({key: node.path, node: node.element});
+
         // @ts-expect-error - getNodeLabel put into scope via stringification
         node.nodeLabel = getNodeLabel(node.element);
         // avoid circular JSON concerns
@@ -126,6 +129,9 @@ class Accessibility extends Gatherer {
         throw new Error('Unable to parse axe results' + returnedValue);
       }
       return returnedValue;
+    }).then(results => {
+      console.log(results);
+      return results;
     });
   }
 }

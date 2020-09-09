@@ -14,6 +14,7 @@ const NetworkRecorder = require('../lib/network-recorder.js');
 const constants = require('../config/constants.js');
 const i18n = require('../lib/i18n/i18n.js');
 const URL = require('../lib/url-shim.js');
+const pageFunctions = require('../lib/page-functions.js');
 
 const UIStrings = {
   /**
@@ -495,6 +496,44 @@ class GatherRunner {
   }
 
   /**
+   * @param {Driver} driver
+   * @param {Partial<LH.Artifacts>} artifacts
+   */
+  static async resolveNodes(driver, artifacts) {
+    function resolveNodes() {
+      return (window.__nodes || []).map(({key, node}) => {
+        return {key, rect: getBoundingClientRect(node)};
+      });
+    }
+    const expression = `(function () {
+      ${pageFunctions.getBoundingClientRectString};
+      return (${resolveNodes.toString()}());
+    })()`;
+
+    /** @type {Array<{key: string, rect: any}>} */
+    const resolved = await driver.evaluateAsync(expression, {useIsolation: true});
+
+    console.log(' resolved ====');
+    console.log(resolved);
+
+    const walk = require('../lib/sd-validation/helpers/walk-object.js');
+    walk(artifacts, (name, value) => {
+      if (!value || typeof value !== 'object') return;
+      if (!value.path && !value.devtoolsNodePath) return;
+
+      const resolvedNode = resolved.find(r => r.key === value.path || r.key === value.devtoolsNodePath);
+      if (!resolvedNode) return;
+
+      console.log(resolvedNode.key, 'set to rect', resolvedNode.rect);
+      if (value.boundingRect) {
+        value.boundingRect = resolvedNode.rect;
+      } else if (value.clientRect) {
+        value.clientRect = resolvedNode.rect;
+      }
+    });
+  }
+
+  /**
    * Return an initialized but mostly empty set of base artifacts, to be
    * populated as the run continues.
    * @param {{driver: Driver, requestedUrl: string, settings: LH.Config.Settings}} options
@@ -775,8 +814,14 @@ class GatherRunner {
     GatherRunner._addLoadDataToBaseArtifacts(passContext, loadData, passConfig.passName);
 
     // Run `afterPass()` on gatherers and return collected artifacts.
+    // await driver.sendCommand('Emulation.setScriptExecutionDisabled', {value: true});
     await GatherRunner.afterPass(passContext, loadData, gathererResults);
-    const artifacts = GatherRunner.collectArtifacts(gathererResults);
+    // await driver.sendCommand('Emulation.setScriptExecutionDisabled', {value: false});
+    const artifacts = await GatherRunner.collectArtifacts(gathererResults);
+
+    if (process.env.RESOLVE_NODES) {
+      await this.resolveNodes(driver, artifacts.artifacts);
+    }
 
     log.timeEnd(status);
     return artifacts;
