@@ -8,6 +8,10 @@
 /**
  * @fileoverview Audit which identifies third-party code on the page which can be lazy loaded.
  * The audit will recommend a facade alternative which is used to imitate the third party resource until it is needed.
+ *
+ * Entity: Set of domains which are used by a company or product area to deliver third party resources
+ * Product: Specific piece of software belonging to an entity. Entities can have multiple products.
+ * Facade: Placeholder for a product which looks likes the actual product and replaces itself with that product when the user needs it.
  */
 
 const Audit = require('./audit.js');
