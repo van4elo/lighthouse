@@ -5,6 +5,11 @@
  */
 'use strict';
 
+/**
+ * @fileoverview Audit which identifies third-party code on the page which can be lazy loaded.
+ * The audit will recommend a facade alternative which is used to imitate the third party resource until it is needed.
+ */
+
 const Audit = require('./audit.js');
 const i18n = require('../lib/i18n/i18n.js');
 const thirdPartyWeb = require('../lib/third-party-web.js');
@@ -29,7 +34,7 @@ const UIStrings = {
   }`,
   /** Label for a table column that displays the name of a lazy loading facade alternative for a third party resource. Lazy loading means loading resources is deferred until they are needed. */
   columnFacade: 'Facade Alternative',
-  /** Label for a table column that displays the name of the third party product that a URL is used for. Lazy loading means loading resources is deferred until they are needed. */
+  /** Label for a table column that displays the name of the third party product that a URL is used for. */
   columnProduct: 'Product',
 };
 
@@ -66,12 +71,12 @@ class LazyThirdParty extends Audit {
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
       const product = thirdPartyWeb.getProduct(url);
-      if (!entity || mainEntity && entity.name === mainEntity.name) continue;
+      if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
       /** @type {Map<string, ProductSummary>} */
       const productSummaries = entitySummaries.get(entity.name) || new Map();
       if (product && product.facades && product.facades.length) {
-        // Record new url if product has a facade
+        // Record new url if product has a facade.
         const productSummary = productSummaries.get(product.name) || {
           product,
           cutoffTime: Infinity,
@@ -117,18 +122,19 @@ class LazyThirdParty extends Audit {
     const tasks = await MainThreadTasks.request(trace, context);
     const multiplier = settings.throttlingMethod === 'simulate' ?
       settings.throttling.cpuSlowdownMultiplier : 1;
-    const {byURL} = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
-    const productSummaries = LazyThirdParty.getProductSummaries(byURL, mainEntity);
+    const thirdPartySummaries = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
+    const productSummaries
+      = LazyThirdParty.getProductSummaries(thirdPartySummaries.byURL, mainEntity);
 
     const summary = {wastedBytes: 0, wastedMs: 0};
 
-    /** @type LH.Audit.Details.TableItem[] */
+    /** @type {LH.Audit.Details.TableItem[]} */
     const results = [];
     for (const productSummary of productSummaries) {
       const product = productSummary.product;
       if (!product.facades || !product.facades.length) continue;
 
-      // The first facade should always be the best one
+      // The first facade should always be the best one.
       const bestFacade = product.facades[0];
 
       const items = [];
@@ -139,8 +145,8 @@ class LazyThirdParty extends Audit {
         transferSize += urlStats.transferSize;
         blockingTime += urlStats.blockingTime;
       }
-      items.sort((firstEl, secondEl) => {
-        return secondEl.transferSize - firstEl.transferSize;
+      items.sort((a, b) => {
+        return b.transferSize - a.transferSize;
       });
       summary.wastedBytes += transferSize;
       summary.wastedMs += blockingTime;
@@ -166,13 +172,12 @@ class LazyThirdParty extends Audit {
 
     /** @type {LH.Audit.Details.Table['headings']} */
     const headings = [
-      {key: 'productName', itemType: 'text', text: str_(UIStrings.columnProduct),
-        subItemsHeading: {key: 'url', itemType: 'url'}},
+      /* eslint-disable max-len */
+      {key: 'productName', itemType: 'text', subItemsHeading: {key: 'url', itemType: 'url'}, text: str_(UIStrings.columnProduct)},
       {key: 'facade', itemType: 'link', text: str_(UIStrings.columnFacade)},
-      {key: 'transferSize', granularity: 1, itemType: 'bytes',
-        text: str_(i18n.UIStrings.columnTransferSize), subItemsHeading: {key: 'transferSize'}},
-      {key: 'blockingTime', granularity: 1, itemType: 'ms',
-        text: str_(i18n.UIStrings.columnBlockingTime), subItemsHeading: {key: 'blockingTime'}},
+      {key: 'transferSize', granularity: 1, itemType: 'bytes', subItemsHeading: {key: 'transferSize'}, text: str_(i18n.UIStrings.columnTransferSize)},
+      {key: 'blockingTime', granularity: 1, itemType: 'ms', subItemsHeading: {key: 'blockingTime'}, text: str_(i18n.UIStrings.columnBlockingTime)},
+      /* eslint-enable max-len */
     ];
 
     return {
