@@ -663,6 +663,13 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
+"@types/puppeteer@1.19.x":
+  version "1.19.1"
+  resolved "https://registry.yarnpkg.com/@types/puppeteer/-/puppeteer-1.19.1.tgz#942ca62288953a0f5fbbc25c103b5f2ba28b60ab"
+  integrity sha512-ReWZvoEfMiJIA3AG+eM+nCx5GKrU2ANVYY5TC0nbpeiTCtnJbcqnmBbR8TkXMBTvLBYcuTOAELbTcuX73siDNQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/raven@^2.5.1":
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/@types/raven/-/raven-2.5.1.tgz#62ef0a59e29691945e1f295b62ed199619cbd9b6"
@@ -2865,10 +2872,10 @@ detective@^5.0.2:
     defined "^1.0.0"
     minimist "^1.1.1"
 
-devtools-protocol@0.0.790520:
-  version "0.0.790520"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.790520.tgz#c7b72d42345c53c506c2a886c9631fcd3a276810"
-  integrity sha512-H8pG4/xFedZNntd8klkpLyLBB6zxDzPHDNXxALATtNF6sLaR8zo1A/Lym1/7OC23BflKWsbOoPS3cyFCBTMV2w==
+devtools-protocol@0.0.801017:
+  version "0.0.801017"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.801017.tgz#340754ebff17b73ddea1b15716ec53887261372c"
+  integrity sha512-vsOhv/pe1CV3yO3d8ZCRuLlu9FY0Kw4P5TVIC6htjyVfNeklCpFmUrEfvY0ju/y9dyAgwiOhe7pcreRh4/EaZw==
 
 diff-sequences@^24.9.0:
   version "24.9.0"
@@ -5408,15 +5415,20 @@ lighthouse-logger@^1.0.0, lighthouse-logger@^1.2.0:
     debug "^2.6.8"
     marky "^1.2.0"
 
-lighthouse-plugin-publisher-ads@^1.1.0-beta.0:
-  version "1.1.0-beta.0"
-  resolved "https://registry.yarnpkg.com/lighthouse-plugin-publisher-ads/-/lighthouse-plugin-publisher-ads-1.1.0-beta.0.tgz#9279958851fde29b73fdcf96e2b36fa16a1ea5c0"
-  integrity sha512-AYNgSTYhVshp+As+Dh9NWnEXx81d/oawYQtr6qJhgM9zM+8upcO/AHuKQFmQI9vn61XOM3zmxOP4WNcDLCEYFg==
+lighthouse-plugin-publisher-ads@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/lighthouse-plugin-publisher-ads/-/lighthouse-plugin-publisher-ads-1.2.0.tgz#3b14ce66f439727d95160e386f9d1f85b5480c51"
+  integrity sha512-u1ufb/oX9LQOF1G6PPBYJ7B6golY8OunoqFRYEEHk8CtdLPkbXe7FKIaUj9sz5G65BvkMtCgtTa2YIjKXwjP4w==
   dependencies:
     "@tusbar/cache-control" "^0.3.1"
     esprima "^4.0.1"
     intl-messageformat "^4.1.2"
     yargs "^13.3.0"
+
+lighthouse-stack-packs@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lighthouse-stack-packs/-/lighthouse-stack-packs-1.0.0.tgz#e31ae871c775da1a121bab968c9b4a13ec599a23"
+  integrity sha512-6btAhPYM7+ZisPymQP07QHOCMkYE6kjBeOFB1oS0mIuk1+WhClSdT5ri3sv6jQrS/xablpfWtJf3R23HCoHr2w==
 
 lines-and-columns@^1.1.6:
   version "1.1.6"

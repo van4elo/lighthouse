@@ -122,8 +122,8 @@ declare global {
       HTTPRedirect: {value: boolean};
       /** The issues surfaced in the devtools Issues panel */
       InspectorIssues: Artifacts.InspectorIssues;
-      /** JS coverage information for code used during page load. Keyed by URL. */
-      JsUsage: Record<string, Crdp.Profiler.ScriptCoverage[]>;
+      /** JS coverage information for code used during page load. Keyed by network URL. */
+      JsUsage: Record<string, Array<Omit<Crdp.Profiler.ScriptCoverage, 'url'>>>;
       /** Parsed version of the page's Web App Manifest, or null if none found. */
       Manifest: Artifacts.Manifest | null;
       /** The URL loaded with interception */
@@ -184,6 +184,7 @@ declare global {
         violations: Array<AxeResult>;
         notApplicable: Array<Pick<AxeResult, 'id'>>;
         incomplete: Array<AxeResult>;
+        version: string;
       }
 
       export interface CSSStyleSheetInfo {
@@ -725,7 +726,13 @@ declare global {
 
       export interface Form {
         /** If attributes is missing that means this is a formless set of elements. */
-        attributes?: { id: string, name: string, autocomplete: string, nodeLabel: string, snippet: string,};
+        attributes?: {
+          id: string,
+          name: string,
+          autocomplete: string,
+          nodeLabel: string,
+          snippet: string,
+        };
         inputs: Array<FormInput>;
         labels: Array<FormLabel>;
       }
@@ -735,7 +742,11 @@ declare global {
         id: string;
         name: string;
         placeholder?: string;
-        autocomplete: string;
+        autocomplete: {
+          property: string;
+          attribute: string | null;
+          prediction: string | null;
+        }
         nodeLabel: string;
         snippet: string;
       }
