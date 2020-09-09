@@ -343,4 +343,74 @@ module.exports = [
       },
     },
   },
+  {
+    lhr: {
+      requestedUrl: 'http://localhost:10200/perf/third-party.html',
+      finalUrl: 'http://localhost:10200/perf/third-party.html',
+      audits: {
+        'lazy-third-party': {
+          score: 0,
+          displayValue: '1 facade alternative available',
+          details: {
+            items: [
+              {
+                productName: 'YouTube Embedded Player',
+                facade: {
+                  type: 'link',
+                  text: 'Lite YouTube',
+                  url: 'https://github.com/paulirish/lite-youtube-embed',
+                },
+                blockingTime: 0,
+                subItems: {
+                  type: 'subitems',
+                  items: [
+                    {
+                      url: 'https://www.youtube.com/s/player/8c24a503/player_ias.vflset/en_US/base.js',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://i.ytimg.com/vi/tgbNymZ7vqY/maxresdefault.jpg',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://www.youtube.com/s/player/8c24a503/www-embed-player.vflset/www-embed-player.js',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://www.youtube.com/s/player/8c24a503/www-player.css',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://www.youtube.com/embed/tgbNymZ7vqY',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://www.youtube.com/s/player/8c24a503/player_ias.vflset/en_US/embed.js',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://www.youtube.com/yts/jsbin/fetch-polyfill-vfl6MZH8P/fetch-polyfill.js',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                    {
+                      url: 'https://yt3.ggpht.com/a/AATXAJxtCYVD65XPtigYUOad-Nd2v3EvnXnz__MkJrg=s68-c-k-c0x00ffffff-no-rj',
+                      mainThreadTime: 0,
+                      blockingTime: 0,
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
 ];
