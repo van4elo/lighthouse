@@ -18,28 +18,63 @@ const UIStrings = {
   /** Table column header for the type of issue. */
   columnIssueType: 'Issue Type',
   /** Message shown in a data table when the item is a SameSiteCookie issue. */
-  sameSiteMsg: 'This is a SameSite Cookies issue',
-  /** Message shown in a data table when the item is a MixedContent issue. */
-  mixedContentMsg: 'This is a Mixed Content issue',
-  /** Message shown in a data table when the item is a BlockedByResponse issue. */
-  blockedByResponseMsg: 'This is a Blocked By Response issue',
-  /** Message shown in a data table when the item is a HeavyAds issue. */
-  heavyAdsMsg: 'This is a Heavy Ads issue',
-  /** Message shown in a data table when the item is a ContentSecurityPolicy issue. */
-  contentSecurityPolicyMsg: 'This is a Content Security Policy issue',
+  sameSiteMessage: 'This is a SameSite Cookies issue',
+  /** Message shown in a data table when the item is a MixedContent issue. This is when some resources are loaded over an insecure HTTP connection. */
+  mixedContentMessage: 'Some resources like images, stylesheets or scripts ' +
+    'are being accessed over an insecure HTTP connection',
+  /** Message shown in a data table when the item is a BlockedByResponse issue. This is when a resource is blocked due to not being allowed by a Cross-Origin Embedder Policy. */
+  coepResourceBlockedMessage: 'A resource was blocked due to not being ' +
+    'allowed by a Cross-Origin Embedder Policy',
+  /** Message shown in a data table when the item is a BlockedByResponse issue. This is when a frame is blocked due to not being allowed by a Cross-Origin Embedder Policy. */
+  coepFrameBlockedMessage: 'A frame was blocked due to not being ' +
+    'allowed by a Cross-Origin Embedder Policy',
+  /** Message shown in a data table when the item is a BlockedByResponse issue. This is when navigation to a document with a Cross-Origin Opener Policy is blocked. */
+  coopIframeBlockedMessage: 'An iframe navigation to a document with ' +
+    'a Cross-Origin Opener Policy was blocked',
+  /** Message shown in a data table when the item is a HeavyAds issue where an ad uses more than 4 megabytes of network bandwith. */
+  heavyAdsNetworkLimitMessage: 'The page contains ads that use ' +
+    'more than 4 megabytes of network bandwidth',
+  /** Message shown in a data table when the item is a HeavyAds issue where an ad has used the main thread for more than 60 seconds in total. */
+  heavyAdsCPUTotalLimitMessage: 'The page contains ads that use the ' +
+    'main thread for more than 60 seconds in total',
+  /** Message shown in a data table when the item is a HeavyAds issue where an ad has used the main thread for more than 15 seconds in any 30 second window. */
+  heavyAdsCPUPeakLimitMessage: 'The page contains ads that use the ' +
+    'main thread for more than 15 seconds in a 30 second window',
+  /** Message shown in a data table when the item is a ContentSecurityPolicy issue where resources are blocked due to not being in the Content Security Policy header. */
+  cspUrlViolationMessage: 'The CSP of the page blocks some resources because ' +
+    'their origin is not included in the content security policy header',
+  /** Message shown in a data table when the item is a ContentSecurityPolicy issue where the Content Security Policy blocks inline execution of scripts and stylesheets. */
+  cspInlineViolationMessage: 'The CSP of the page blocks ' +
+    'inline execution of scripts and stylesheets',
+  /** Message shown in a data table when the item is a ContentSecurityPolicy issue where the Content Security Policy blocks the use of the `eval` function in Javascript. */
+  cspEvalViolationMessage: 'The CSP of the site blocks ' +
+    'the use of `eval` in JavaScript',
 };
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
+
 /** @type {Object<string, string>} */
-const issueMap = {
-  'sameSiteCookies': str_(UIStrings.sameSiteMsg),
-  'mixedContent': str_(UIStrings.mixedContentMsg),
-  'blockedByResponse': str_(UIStrings.blockedByResponseMsg),
-  'heavyAds': str_(UIStrings.heavyAdsMsg),
-  'contentSecurityPolicy': str_(UIStrings.contentSecurityPolicyMsg),
+const heavyAdsMsgMap = {
+  'NetworkTotalLimit': str_(UIStrings.heavyAdsNetworkLimitMessage),
+  'CpuTotalLimit': str_(UIStrings.heavyAdsCPUTotalLimitMessage),
+  'CpuPeakLimit': str_(UIStrings.heavyAdsCPUPeakLimitMessage),
+};
+/** @type {Object<string, string>} */
+const contentSecurityPolicyMsgMap = {
+  'kInlineViolation': str_(UIStrings.cspInlineViolationMessage),
+  'kEvalViolation': str_(UIStrings.cspEvalViolationMessage),
+  'kURLViolation': str_(UIStrings.cspUrlViolationMessage),
+};
+/** @type {Object<string, string>} */
+const blockedByResponseMsgMap = {
+  'CoepFrameResourceNeedsCoepHeader': str_(UIStrings.coepResourceBlockedMessage),
+  'CoopSandboxedIFrameCannotNavigateToCoopPage': str_(UIStrings.coopIframeBlockedMessage),
+  'CorpNotSameOrigin': str_(UIStrings.coepResourceBlockedMessage),
+  'CorpNotSameOriginAfterDefaultedToSameOriginByCoep': str_(UIStrings.coepFrameBlockedMessage),
+  'CorpNotSameSite': str_(UIStrings.coepResourceBlockedMessage),
 };
 
-/** @typedef {{issueType: string, description: string, requestUrl?: string}} IssueItem */ 
+/** @typedef {{issueType: string, description: string, requestUrl?: string}} IssueItem */
 
 class IssuesPanelEntries extends Audit {
   /**
@@ -65,7 +100,12 @@ class IssuesPanelEntries extends Audit {
     }
 
     return mixedContentIssues.map(issue => {
-
+      const requestUrl = issue.request && issue.request.url;
+      return {
+        issueType: 'MixedContent',
+        description: str_(UIStrings.mixedContentMessage),
+        requestUrl: issue.mainResourceURL || requestUrl,
+      };
     });
   }
 
@@ -81,9 +121,9 @@ class IssuesPanelEntries extends Audit {
     return sameSiteCookieIssues.map(issue => {
       const requestUrl = issue.request && issue.request.url;
       return {
-        issueType: 'SameSite Cookie',
-        description: str_(UIStrings.sameSiteMsg),
-        requestUrl: requestUrl || issue.cookieUrl,
+        issueType: 'SameSiteCookie',
+        description: str_(UIStrings.sameSiteMessage),
+        requestUrl: issue.cookieUrl || requestUrl,
       };
     });
   }
@@ -100,8 +140,10 @@ class IssuesPanelEntries extends Audit {
     return blockedByResponseIssues.map(issue => {
       const blockedReason = issue.reason;
       return {
-        issueType: 'Blocked By Response'
-      }
+        issueType: 'BlockedByResponse',
+        description: blockedByResponseMsgMap[blockedReason],
+        requestUrl: issue.request.url,
+      };
     });
   }
 
@@ -115,7 +157,11 @@ class IssuesPanelEntries extends Audit {
     }
 
     return heavyAdsIssues.map(issue => {
-      
+      const reason = issue.reason;
+      return {
+        issueType: 'HeavyAds',
+        description: heavyAdsMsgMap[reason],
+      };
     });
   }
 
@@ -128,8 +174,19 @@ class IssuesPanelEntries extends Audit {
       return [];
     }
 
-    return cspIssues.map(issue => {
-      
+    return cspIssues
+    .filter(issue => {
+      // kTrustedTypesSinkViolation and kTrustedTypesPolicyViolation aren't currently supported by the Issues panel
+      return issue.contentSecurityPolicyViolationType !== 'kTrustedTypesSinkViolation' &&
+        issue.contentSecurityPolicyViolationType !== 'kTrustedTypesPolicyViolation';
+    })
+    .map(issue => {
+      const blockedUrl = issue.blockedURL;
+      return {
+        issueType: 'ContentSecurityPolicy',
+        description: contentSecurityPolicyMsgMap[issue.contentSecurityPolicyViolationType],
+        requestUrl: blockedUrl,
+      };
     });
   }
 
@@ -150,7 +207,7 @@ class IssuesPanelEntries extends Audit {
     const items = [];
 
     for (const [issueType, issuesOfType] of Object.entries(issues)) {
-      switch(issueType) {
+      switch (issueType) {
         case 'sameSiteCookies':
           items.push(...this.getSameSiteCookieItems(issuesOfType));
           break;
