@@ -39,6 +39,8 @@ const issueMap = {
   'contentSecurityPolicy': str_(UIStrings.contentSecurityPolicyMsg),
 };
 
+/** @typedef {{issueType: string, description: string, requestUrl?: string}} IssueItem */ 
+
 class IssuesPanelEntries extends Audit {
   /**
    * @return {LH.Audit.Meta}
@@ -77,7 +79,12 @@ class IssuesPanelEntries extends Audit {
     }
 
     return sameSiteCookieIssues.map(issue => {
-      
+      const requestUrl = issue.request && issue.request.url;
+      return {
+        issueType: 'SameSite Cookie',
+        description: str_(UIStrings.sameSiteMsg),
+        requestUrl: requestUrl || issue.cookieUrl,
+      };
     });
   }
 
@@ -92,7 +99,9 @@ class IssuesPanelEntries extends Audit {
 
     return blockedByResponseIssues.map(issue => {
       const blockedReason = issue.reason;
-      
+      return {
+        issueType: 'Blocked By Response'
+      }
     });
   }
 
@@ -132,18 +141,31 @@ class IssuesPanelEntries extends Audit {
     /** @type {LH.Audit.Details.Table['headings']} */
     const headings = [
       {key: 'issueType', itemType: 'text', text: str_(UIStrings.columnIssueType)},
-      {key: 'reason', itemType: 'text', text: 'Reason'},
+      {key: 'description', itemType: 'text', text: str_(i18n.UIStrings.columnDescription)},
+      {key: 'requestUrl', itemType: 'url', text: 'Request URL'},
     ];
 
     const issues = artifacts.InspectorIssues;
+    /** @type {Array<IssueItem>} */
     const items = [];
 
     for (const [issueType, issuesOfType] of Object.entries(issues)) {
-      for (const _ of issuesOfType) {
-        items.push({
-          issueType,
-          reason: issueMap[issueType],
-        });
+      switch(issueType) {
+        case 'sameSiteCookies':
+          items.push(...this.getSameSiteCookieItems(issuesOfType));
+          break;
+        case 'mixedContent':
+          items.push(...this.getMixedContentItems(issuesOfType));
+          break;
+        case 'blockedByResponse':
+          items.push(...this.getBlockedByResponseItems(issuesOfType));
+          break;
+        case 'heavyAds':
+          items.push(...this.getHeavyAdsItems(issuesOfType));
+          break;
+        case 'contentSecurityPolicy':
+          items.push(...this.getContentSecurityPolicyItems(issuesOfType));
+          break;
       }
     }
 
