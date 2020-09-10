@@ -14,7 +14,8 @@ const UIStrings = {
   /** Title of a Lighthouse audit that provides detail on inspector issues. This descriptive title is shown to users when issues are detected and logged into the devtools Issues panel. */
   failureTitle: 'Isssues were logged in the Issues panel',
   /** Description of a Lighthouse audit that tells the user why issues being logged to the devtools Issues panel are a cause for concern and so should be fixed. This is displayed after a user expands the section to see more. No character length limits. */
-  description: 'Description TBD',
+  description: 'Issues logged to the Issues panel indicate unresolved problems. ' +
+  'They can come from network request failures and other browser concerns. ',
   /** Table column header for the type of issue. */
   columnIssueType: 'Issue Type',
   /** Message shown in a data table when the item is a SameSiteCookie issue. */
