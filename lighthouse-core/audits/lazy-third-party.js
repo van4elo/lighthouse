@@ -77,7 +77,6 @@ class LazyThirdParty extends Audit {
       const product = thirdPartyWeb.getProduct(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
-      /** @type {Map<string, ProductSummary>} */
       const productSummaries = entitySummaries.get(entity.name) || new Map();
       if (product && product.facades && product.facades.length) {
         // Record new url if product has a facade.
@@ -94,7 +93,17 @@ class LazyThirdParty extends Audit {
         productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.endTime);
 
         productSummaries.set(product.name, productSummary);
-      } else {
+      }
+      entitySummaries.set(entity.name, productSummaries);
+    }
+
+    for (const [url, urlSummary] of byURL) {
+      const entity = thirdPartyWeb.getEntity(url);
+      const product = thirdPartyWeb.getProduct(url);
+      if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
+
+      const productSummaries = entitySummaries.get(entity.name) || new Map();
+      if (!product || !product.facades || !product.facades.length) {
         // If the url does not have a facade but one or more products on its entity do,
         // we still want to record this url because it was probably fetched by a product with a facade.
         for (const productSummary of productSummaries.values()) {
