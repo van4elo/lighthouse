@@ -88,6 +88,9 @@ class LazyThirdParty extends Audit {
         };
 
         productSummary.urlSummaries.set(url, urlSummary);
+
+        // This is the time the product resource is fetched.
+        // Any resources of the same entity fetched after this point are considered as part of this product.
         productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.endTime);
 
         productSummaries.set(product.name, productSummary);
@@ -144,7 +147,7 @@ class LazyThirdParty extends Audit {
       const items = [];
       let transferSize = 0;
       let blockingTime = 0;
-      for (const [url, urlStats] of Array.from(productSummary.urlSummaries)) {
+      for (const [url, urlStats] of productSummary.urlSummaries) {
         items.push({url, ...urlStats});
         transferSize += urlStats.transferSize;
         blockingTime += urlStats.blockingTime;

@@ -25,6 +25,8 @@ function getEntity(url) {
 }
 
 /**
+ * `third-party-web` throws when the passed in string doesn't appear to have any domain whatsoever.
+ * We pass in some not-so-url-like things, so make the dependent-code simpler by making this call safe.
  * @param {string} url
  * @return {ThirdPartyProduct|undefined}
  */
