@@ -35,11 +35,12 @@ setTimeout(() => {
   top.appendChild(imgEl);
   top.appendChild(textEl);
 
-  // layout-shift-elements: ensure we can handle missing shift elements
+  // layout-shift-elements: ensure we can handle shift elements that the protocol can no longer identify
+  // see https://github.com/GoogleChrome/lighthouse/pull/10877
   if (window.location.href.includes('?missing')) {
     stall(100); // force a long task to ensure we reach the rerendering stage
     setTimeout(async () => {
-      await rerender(20); // rerender a large number of nodes to evict the early layout shift node
+      await rerender(30); // rerender a large number of nodes to evict the early layout shift node
       document.body.textContent = 'Now it is all gone!';
     }, 50);
   }
