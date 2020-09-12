@@ -37,7 +37,7 @@ setTimeout(() => {
 
   // layout-shift-elements: ensure we can handle shift elements that the protocol can no longer identify
   // see https://github.com/GoogleChrome/lighthouse/pull/10877
-  if (window.location.href.includes('?missing')) {
+  if (window.location.href.includes('?evicted')) {
     stall(100); // force a long task to ensure we reach the rerendering stage
     setTimeout(async () => {
       await rerender(30); // rerender a large number of nodes to evict the early layout shift node
