@@ -40,10 +40,11 @@ const UIStrings = {
 };
 
 /**
- * Warn when the CPU seemed to be at least ~2x weaker than our regular target device.
+ * We want to warn when the CPU seemed to be at least ~2x weaker than our regular target device.
+ * We're starting with a more conservative value that will increase over time to our true target threshold.
  * @see https://github.com/GoogleChrome/lighthouse/blob/ccbc8002fd058770d14e372a8301cc4f7d256414/docs/throttling.md#calibrating-multipliers
  */
-const SLOW_CPU_BENCHMARK_INDEX_THRESHOLD = 1200;
+const SLOW_CPU_BENCHMARK_INDEX_THRESHOLD = 1000;
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 
