@@ -9,10 +9,10 @@ const Audit = require('../audit.js');
 const i18n = require('../../lib/i18n/i18n.js');
 
 const UIStrings = {
-  /** Title of a Lighthouse audit that provides detail on inspector issues. This descriptive title is shown to users when no issues were logged into the devtools Issues panel. */
+  /** Title of a Lighthouse audit that provides detail on various types of issues with the page. This descriptive title is shown to users when no issues were logged into the Chrome DevTools Issues panel. */
   title: 'No issues in the Issues panel',
   /** Title of a Lighthouse audit that provides detail on inspector issues. This descriptive title is shown to users when issues are detected and logged into the devtools Issues panel. */
-  failureTitle: 'Isssues were logged in the Issues panel',
+  failureTitle: 'Issues were logged in the Issues panel',
   /** Description of a Lighthouse audit that tells the user why issues being logged to the devtools Issues panel are a cause for concern and so should be fixed. This is displayed after a user expands the section to see more. No character length limits. */
   description: 'Issues logged to the Issues panel indicate unresolved problems. ' +
   'They can come from network request failures and other browser concerns. ',
@@ -54,7 +54,7 @@ const UIStrings = {
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 
-/** @type {Object<string, string>} */
+/** @type {Record<string, string>} */
 const heavyAdsMsgMap = {
   'NetworkTotalLimit': str_(UIStrings.heavyAdsNetworkLimitMessage),
   'CpuTotalLimit': str_(UIStrings.heavyAdsCPUTotalLimitMessage),
