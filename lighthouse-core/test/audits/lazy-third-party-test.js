@@ -13,38 +13,36 @@ const pwaTrace = require('../fixtures/traces/progressive-app-m60.json');
 const pwaDevtoolsLog = require('../fixtures/traces/progressive-app-m60.devtools.log.json');
 const noThirdPartyTrace = require('../fixtures/traces/no-tracingstarted-m74.json');
 
+function resourceEntry(startTime, headerEndTime, endTime, transferSize, url) {
+  return {
+    url,
+    startTime,
+    endTime,
+    transferSize,
+    timing: {
+      receiveHeadersEnd: (headerEndTime - startTime) * 1000,
+    },
+  };
+}
+
+function facadableProductEntry(startTime, headerEndTime, endTime, transferSize, id) {
+  const url = `https://widget.intercom.io/widget/${id}`;
+  return resourceEntry(startTime, headerEndTime, endTime, transferSize, url);
+}
+
+function entityResourceEntry(startTime, headerEndTime, endTime, transferSize, id) {
+  const url = `https://js.intercomcdn.com/frame-modern.${id}.js`;
+  return resourceEntry(startTime, headerEndTime, endTime, transferSize, url);
+}
+
 /* eslint-env jest */
 describe('Lazy load third party resources', () => {
   it('correctly identifies a lazy loadable third party resource', async () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
-        {
-          url: 'https://example.com',
-          startTime: 100,
-          endTime: 101,
-          transferSize: 2000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://widget.intercom.io/widget/tx2p130c',
-          startTime: 200,
-          endTime: 201,
-          transferSize: 4000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
-          startTime: 300,
-          endTime: 301,
-          transferSize: 8000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
+        resourceEntry(100, 101, 102, 2000, 'https://example.com'),
+        facadableProductEntry(200, 201, 202, 4000, '1'),
+        entityResourceEntry(300, 301, 302, 8000, 'a'),
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
       URL: {finalUrl: 'https://example.com'},
@@ -67,177 +65,15 @@ describe('Lazy load third party resources', () => {
         blockingTime: 0,
         subItems: {type: 'subitems', items: [
           {
-            url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
+            url: 'https://js.intercomcdn.com/frame-modern.a.js',
             mainThreadTime: 0,
             blockingTime: 0,
             transferSize: 8000,
             firstStartTime: 300,
-            firstEndTime: 300.5,
+            firstEndTime: 301,
           },
           {
-            url: 'https://widget.intercom.io/widget/tx2p130c',
-            mainThreadTime: 0,
-            blockingTime: 0,
-            transferSize: 4000,
-            firstStartTime: 200,
-            firstEndTime: 200.5,
-          },
-        ]},
-      },
-    ]);
-  });
-
-  it('handle multiple requests to same product resource', async () => {
-    const artifacts = {
-      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
-        {
-          url: 'https://example.com',
-          startTime: 100,
-          endTime: 101,
-          transferSize: 2000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://widget.intercom.io/widget/tx2p130c',
-          startTime: 200,
-          endTime: 201,
-          transferSize: 2000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
-          startTime: 300,
-          endTime: 301,
-          transferSize: 8000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://widget.intercom.io/widget/tx2p130c',
-          startTime: 400,
-          endTime: 401,
-          transferSize: 2000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-      ])},
-      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
-      URL: {finalUrl: 'https://example.com'},
-    };
-
-    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
-
-    expect(results.score).toBe(0);
-    expect(results.displayValue).toBeDisplayString('1 facade alternative available');
-    expect(results.details.items).toEqual([
-      {
-        productName: 'Intercom Widget',
-        facade: {
-          type: 'link',
-          text: 'React Live Chat Loader',
-          url: 'https://github.com/calibreapp/react-live-chat-loader',
-        },
-        transferSize: 12000,
-        blockingTime: 0,
-        subItems: {type: 'subitems', items: [
-          {
-            url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
-            mainThreadTime: 0,
-            blockingTime: 0,
-            transferSize: 8000,
-            firstStartTime: 300,
-            firstEndTime: 300.5,
-          },
-          {
-            url: 'https://widget.intercom.io/widget/tx2p130c',
-            mainThreadTime: 0,
-            blockingTime: 0,
-            transferSize: 4000,
-            firstStartTime: 200,
-            firstEndTime: 200.5,
-          },
-        ]},
-      },
-    ]);
-  });
-
-  it('uses receiveHeadersEnd as cutoff', async () => {
-    const artifacts = {
-      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
-        {
-          url: 'https://example.com',
-          startTime: 100,
-          endTime: 101,
-          transferSize: 2000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://widget.intercom.io/widget/tx2p130c',
-          startTime: 200,
-          endTime: 202,
-          transferSize: 4000,
-          timing: {
-            receiveHeadersEnd: 1000,
-          },
-        },
-        {
-          url: 'https://js.intercomcdn.com/frame-modern.aaaaaaaaa.js',
-          startTime: 200.5, // Between startTime and startTime + receiveHeadersEnd, so it is ignored
-          endTime: 205,
-          transferSize: 8000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-        {
-          url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
-          startTime: 201.5, // Between startTime + receiveHeadersEnd and endTime, so it is included
-          endTime: 205,
-          transferSize: 8000,
-          timing: {
-            receiveHeadersEnd: 500,
-          },
-        },
-      ])},
-      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
-      URL: {finalUrl: 'https://example.com'},
-    };
-
-    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
-
-    expect(results.score).toBe(0);
-    expect(results.displayValue).toBeDisplayString('1 facade alternative available');
-    expect(results.details.items).toEqual([
-      {
-        productName: 'Intercom Widget',
-        facade: {
-          type: 'link',
-          text: 'React Live Chat Loader',
-          url: 'https://github.com/calibreapp/react-live-chat-loader',
-        },
-        transferSize: 12000,
-        blockingTime: 0,
-        subItems: {type: 'subitems', items: [
-          {
-            url: 'https://js.intercomcdn.com/frame-modern.bb95039c.js',
-            mainThreadTime: 0,
-            blockingTime: 0,
-            transferSize: 8000,
-            firstStartTime: 201.5,
-            firstEndTime: 202,
-          },
-          {
-            url: 'https://widget.intercom.io/widget/tx2p130c',
+            url: 'https://widget.intercom.io/widget/1',
             mainThreadTime: 0,
             blockingTime: 0,
             transferSize: 4000,
@@ -249,14 +85,117 @@ describe('Lazy load third party resources', () => {
     ]);
   });
 
+  it('handle multiple requests to same product resource', async () => {
+    const artifacts = {
+      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
+        resourceEntry(100, 101, 102, 2000, 'https://example.com'),
+        // The first product entry is used for the cutoff time
+        facadableProductEntry(200, 201, 202, 2000, '1'),
+        entityResourceEntry(300, 301, 302, 8000, 'a'),
+        facadableProductEntry(400, 401, 402, 2000, '1'),
+      ])},
+      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
+      URL: {finalUrl: 'https://example.com'},
+    };
+
+    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
+    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+
+    expect(results.score).toBe(0);
+    expect(results.displayValue).toBeDisplayString('1 facade alternative available');
+    expect(results.details.items).toEqual([
+      {
+        productName: 'Intercom Widget',
+        facade: {
+          type: 'link',
+          text: 'React Live Chat Loader',
+          url: 'https://github.com/calibreapp/react-live-chat-loader',
+        },
+        transferSize: 12000,
+        blockingTime: 0,
+        subItems: {type: 'subitems', items: [
+          {
+            url: 'https://js.intercomcdn.com/frame-modern.a.js',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 8000,
+            firstStartTime: 300,
+            firstEndTime: 301,
+          },
+          {
+            url: 'https://widget.intercom.io/widget/1',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 4000,
+            firstStartTime: 200,
+            firstEndTime: 201,
+          },
+        ]},
+      },
+    ]);
+  });
+
+  it('uses receiveHeadersEnd as cutoff', async () => {
+    const artifacts = {
+      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
+        resourceEntry(100, 101, 102, 2000, 'https://example.com'),
+        facadableProductEntry(200, 205, 210, 4000, '1'),
+        // Starts between product's startTime and startTime + receiveHeadersEnd, so it is ignored
+        entityResourceEntry(201, 206, 208, 8000, 'a'),
+        // Starts between product's startTime + receiveHeadersEnd and endTime, so it is included
+        entityResourceEntry(206, 208, 215, 8000, 'b'),
+        // Starts past the cutoff but previous call to same url was before cutoff, so it is ignored
+        entityResourceEntry(300, 301, 303, 8000, 'a'),
+      ])},
+      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
+      URL: {finalUrl: 'https://example.com'},
+    };
+
+    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
+    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+
+    expect(results.score).toBe(0);
+    expect(results.displayValue).toBeDisplayString('1 facade alternative available');
+    expect(results.details.items).toEqual([
+      {
+        productName: 'Intercom Widget',
+        facade: {
+          type: 'link',
+          text: 'React Live Chat Loader',
+          url: 'https://github.com/calibreapp/react-live-chat-loader',
+        },
+        transferSize: 12000,
+        blockingTime: 0,
+        subItems: {type: 'subitems', items: [
+          {
+            url: 'https://js.intercomcdn.com/frame-modern.b.js',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 8000,
+            firstStartTime: 206,
+            firstEndTime: 208,
+          },
+          {
+            url: 'https://widget.intercom.io/widget/1',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 4000,
+            firstStartTime: 200,
+            firstEndTime: 205,
+          },
+        ]},
+      },
+    ]);
+  });
+
   it('does not report first party resources', async () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
-        {url: 'https://youtube.com'},
-        {url: 'https://www.youtube.com/embed/tgbNymZ7vqY'},
+        resourceEntry(100, 101, 102, 2000, 'https://intercomcdn.com'),
+        facadableProductEntry(200, 201, 202, 4000, '1'),
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
-      URL: {finalUrl: 'https://youtube.com'},
+      URL: {finalUrl: 'https://intercomcdn.com'},
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
@@ -287,9 +226,11 @@ describe('Lazy load third party resources', () => {
 
   it('not applicable when no third party resources are present', async () => {
     const artifacts = {
-      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([{url: 'chrome://version'}])},
+      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
+        resourceEntry(100, 101, 102, 2000, 'https://example.com'),
+      ])},
       traces: {defaultPass: noThirdPartyTrace},
-      URL: {finalUrl: 'chrome://version'},
+      URL: {finalUrl: 'https://example.com'},
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
