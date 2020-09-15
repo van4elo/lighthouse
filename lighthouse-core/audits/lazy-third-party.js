@@ -90,7 +90,7 @@ class LazyThirdParty extends Audit {
 
         // This is the time the product resource is fetched.
         // Any resources of the same entity fetched after this point are considered as part of this product.
-        productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.endTime);
+        productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.firstEndTime);
 
         productSummaries.set(product.name, productSummary);
       }
@@ -107,7 +107,7 @@ class LazyThirdParty extends Audit {
         // If the url does not have a facade but one or more products on its entity do,
         // we still want to record this url because it was probably fetched by a product with a facade.
         for (const productSummary of productSummaries.values()) {
-          if (urlSummary.startTime < productSummary.cutoffTime) continue;
+          if (urlSummary.firstStartTime < productSummary.cutoffTime) continue;
           productSummary.urlSummaries.set(url, urlSummary);
         }
       }

@@ -37,16 +37,14 @@ describe('Third party summary', () => {
         mainThreadTime: 127.15300000000003,
         blockingTime: 18.186999999999998,
         transferSize: 30827,
-        startTime: 225414.728913,
-        endTime: 225415.177259,
         subItems: {
           items: [
             {
               blockingTime: 18.186999999999998,
               mainThreadTime: 127.15300000000003,
               transferSize: 30827,
-              startTime: 225414.728913,
-              endTime: 225415.177259,
+              firstStartTime: 225414.728913,
+              firstEndTime: 225414.940324,
               url: 'https://www.googletagmanager.com/gtm.js?id=GTM-Q5SW',
             },
           ],
@@ -62,16 +60,14 @@ describe('Third party summary', () => {
         mainThreadTime: 95.15599999999999,
         blockingTime: 0,
         transferSize: 20913,
-        startTime: 225415.251281,
-        endTime: 225416.070654,
         subItems: {
           items: [
             {
               blockingTime: 0,
               mainThreadTime: 55.246999999999986,
               transferSize: 12906,
-              startTime: 225415.251281,
-              endTime: 225415.698851,
+              firstStartTime: 225415.251281,
+              firstEndTime: 225415.469618,
               url: 'https://www.google-analytics.com/analytics.js',
             },
             {

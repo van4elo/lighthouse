@@ -43,9 +43,17 @@ const PASS_THRESHOLD_IN_MS = 250;
  *   mainThreadTime: number,
  *   transferSize: number,
  *   blockingTime: number,
- *   startTime: number,
- *   endTime: number,
+ *   firstStartTime: number,
+ *   firstEndTime: number,
  * }} Summary
+ */
+
+/**
+ * @typedef {{
+ *   mainThreadTime: number,
+ *   transferSize: number,
+ *   blockingTime: number,
+ * }} EntitySummary
  */
 
 /**
@@ -56,6 +64,12 @@ const PASS_THRESHOLD_IN_MS = 250;
  * }} URLSummary
  */
 
+/** @typedef {{
+ *  byEntity: Map<ThirdPartyEntity, EntitySummary>,
+ *  byURL: Map<string, Summary>,
+ *  urls: Map<ThirdPartyEntity, string[]>
+ * }} SummaryMap
+ */
 
 /**
  * Don't bother showing resources smaller than 4KiB since they're likely to be pixels, which isn't
@@ -85,26 +99,31 @@ class ThirdPartySummary extends Audit {
    * @param {Array<LH.Artifacts.NetworkRequest>} networkRecords
    * @param {Array<LH.Artifacts.TaskNode>} mainThreadTasks
    * @param {number} cpuMultiplier
-   * @return {{byEntity: Map<ThirdPartyEntity, Summary>, byURL: Map<string, Summary>, urls: Map<ThirdPartyEntity, string[]>}}
+   * @return {SummaryMap}
    */
   static getSummaries(networkRecords, mainThreadTasks, cpuMultiplier) {
     /** @type {Map<string, Summary>} */
     const byURL = new Map();
-    /** @type {Map<ThirdPartyEntity, Summary>} */
+    /** @type {Map<ThirdPartyEntity, EntitySummary>} */
     const byEntity = new Map();
     const defaultSummary = {
       mainThreadTime: 0,
       blockingTime: 0,
       transferSize: 0,
-      startTime: Infinity,
-      endTime: 0,
     };
 
     for (const request of networkRecords) {
-      const urlSummary = byURL.get(request.url) || {...defaultSummary};
+      const urlSummary = byURL.get(request.url) ||
+        {...defaultSummary, firstStartTime: Infinity, firstEndTime: Infinity};
       urlSummary.transferSize += request.transferSize;
-      urlSummary.startTime = Math.min(urlSummary.startTime, request.startTime);
-      urlSummary.endTime = Math.max(urlSummary.endTime, request.endTime);
+      urlSummary.firstStartTime = Math.min(urlSummary.firstStartTime, request.startTime);
+      if (request.timing) {
+        // Lookahead preparser may start requests before entire HTML is loaded
+        const receiveHeadersEndTime = request.startTime + request.timing.receiveHeadersEnd / 1000;
+        urlSummary.firstEndTime = Math.min(urlSummary.firstEndTime, receiveHeadersEndTime);
+      } else {
+        urlSummary.firstEndTime = Math.min(urlSummary.firstEndTime, request.endTime);
+      }
       byURL.set(request.url, urlSummary);
     }
 
@@ -113,7 +132,8 @@ class ThirdPartySummary extends Audit {
     for (const task of mainThreadTasks) {
       const attributableURL = BootupTime.getAttributableURLForTask(task, jsURLs);
 
-      const urlSummary = byURL.get(attributableURL) || {...defaultSummary};
+      const urlSummary = byURL.get(attributableURL) ||
+        {...defaultSummary, firstStartTime: Infinity, firstEndTime: Infinity};
       const taskDuration = task.selfTime * cpuMultiplier;
       // The amount of time spent on main thread is the sum of all durations.
       urlSummary.mainThreadTime += taskDuration;
@@ -138,8 +158,6 @@ class ThirdPartySummary extends Audit {
       entitySummary.transferSize += urlSummary.transferSize;
       entitySummary.mainThreadTime += urlSummary.mainThreadTime;
       entitySummary.blockingTime += urlSummary.blockingTime;
-      entitySummary.startTime = Math.min(entitySummary.startTime, urlSummary.startTime);
-      entitySummary.endTime = Math.max(entitySummary.endTime, urlSummary.endTime);
       byEntity.set(entity, entitySummary);
 
       const entityURLs = urls.get(entity) || [];
@@ -152,8 +170,8 @@ class ThirdPartySummary extends Audit {
 
   /**
    * @param {ThirdPartyEntity} entity
-   * @param {{byEntity: Map<ThirdPartyEntity, Summary>, byURL: Map<string, Summary>, urls: Map<ThirdPartyEntity, string[]>}} summaries
-   * @param {Summary} stats
+   * @param {SummaryMap} summaries
+   * @param {EntitySummary} stats
    * @return {Array<URLSummary>}
    */
   static makeSubItems(entity, summaries, stats) {
