@@ -361,7 +361,7 @@ module.exports = [
                   url: 'https://github.com/paulirish/lite-youtube-embed',
                 },
                 blockingTime: 0,
-                transferSize: '651128 +/- 5000',
+                transferSize: '651128 +/- 100000',
                 subItems: {
                   type: 'subitems',
                   items: {
