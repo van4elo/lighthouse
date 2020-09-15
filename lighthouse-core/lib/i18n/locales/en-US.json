@@ -863,24 +863,6 @@
   "lighthouse-core/audits/layout-shift-elements.js | title": {
     "message": "Avoid large layout shifts"
   },
-  "lighthouse-core/audits/lazy-third-party.js | columnFacade": {
-    "message": "Facade Alternative"
-  },
-  "lighthouse-core/audits/lazy-third-party.js | columnProduct": {
-    "message": "Product"
-  },
-  "lighthouse-core/audits/lazy-third-party.js | description": {
-    "message": "Some third-party resources can be fetched after the page loads. These third-party resources are used by embedded elements which can be replaced by a facade until the user needs to use them. [Learn more](https://web.dev/efficiently-load-third-party-javascript/)."
-  },
-  "lighthouse-core/audits/lazy-third-party.js | displayValue": {
-    "message": "{itemCount, plural,\n  =1 {# facade alternative available}\n  other {# facade alternatives available}\n  }"
-  },
-  "lighthouse-core/audits/lazy-third-party.js | failureTitle": {
-    "message": "Some third-party resources can be lazy loaded"
-  },
-  "lighthouse-core/audits/lazy-third-party.js | title": {
-    "message": "Lazy load third-party resources"
-  },
   "lighthouse-core/audits/load-fast-enough-for-pwa.js | description": {
     "message": "A fast page load over a cellular network ensures a good mobile user experience. [Learn more](https://web.dev/load-fast-enough-for-pwa/)."
   },
@@ -1288,6 +1270,24 @@
   },
   "lighthouse-core/audits/themed-omnibox.js | title": {
     "message": "Sets a theme color for the address bar."
+  },
+  "lighthouse-core/audits/third-party-facades.js | columnFacade": {
+    "message": "Facade Alternative"
+  },
+  "lighthouse-core/audits/third-party-facades.js | columnProduct": {
+    "message": "Product"
+  },
+  "lighthouse-core/audits/third-party-facades.js | description": {
+    "message": "Some third-party resources can be fetched after the page loads. These third-party resources are used by embedded elements which can be replaced by a facade until the user needs to use them. [Learn more](https://web.dev/efficiently-load-third-party-javascript/)."
+  },
+  "lighthouse-core/audits/third-party-facades.js | displayValue": {
+    "message": "{itemCount, plural,\n  =1 {# facade alternative available}\n  other {# facade alternatives available}\n  }"
+  },
+  "lighthouse-core/audits/third-party-facades.js | failureTitle": {
+    "message": "Some third-party resources can be lazy loaded with a facade alternative"
+  },
+  "lighthouse-core/audits/third-party-facades.js | title": {
+    "message": "Lazy load third-party resources with facade alternatives"
   },
   "lighthouse-core/audits/third-party-summary.js | columnThirdParty": {
     "message": "Third-Party"
