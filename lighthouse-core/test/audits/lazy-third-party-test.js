@@ -25,13 +25,23 @@ function resourceEntry(startTime, headerEndTime, endTime, transferSize, url) {
   };
 }
 
-function facadableProductEntry(startTime, headerEndTime, endTime, transferSize, id) {
+function intercomProductEntry(startTime, headerEndTime, endTime, transferSize, id) {
   const url = `https://widget.intercom.io/widget/${id}`;
   return resourceEntry(startTime, headerEndTime, endTime, transferSize, url);
 }
 
-function entityResourceEntry(startTime, headerEndTime, endTime, transferSize, id) {
+function intercomResourceEntry(startTime, headerEndTime, endTime, transferSize, id) {
   const url = `https://js.intercomcdn.com/frame-modern.${id}.js`;
+  return resourceEntry(startTime, headerEndTime, endTime, transferSize, url);
+}
+
+function youtubeProductEntry(startTime, headerEndTime, endTime, transferSize, id) {
+  const url = `https://www.youtube.com/embed/${id}`;
+  return resourceEntry(startTime, headerEndTime, endTime, transferSize, url);
+}
+
+function youtubeResourceEntry(startTime, headerEndTime, endTime, transferSize, id) {
+  const url = `https://i.ytimg.com/${id}/maxresdefault.jpg`;
   return resourceEntry(startTime, headerEndTime, endTime, transferSize, url);
 }
 
@@ -41,8 +51,8 @@ describe('Lazy load third party resources', () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
         resourceEntry(100, 101, 102, 2000, 'https://example.com'),
-        facadableProductEntry(200, 201, 202, 4000, '1'),
-        entityResourceEntry(300, 301, 302, 8000, 'a'),
+        intercomProductEntry(200, 201, 202, 4000, '1'),
+        intercomResourceEntry(300, 301, 302, 8000, 'a'),
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
       URL: {finalUrl: 'https://example.com'},
@@ -85,14 +95,92 @@ describe('Lazy load third party resources', () => {
     ]);
   });
 
+  it('handles multiple products with facades', async () => {
+    const artifacts = {
+      devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
+        resourceEntry(100, 101, 102, 2000, 'https://example.com'),
+        intercomProductEntry(200, 201, 202, 4000, '1'),
+        youtubeProductEntry(210, 211, 212, 3000, '2'),
+        intercomResourceEntry(300, 301, 302, 8000, 'a'),
+        youtubeResourceEntry(310, 311, 312, 7000, 'b'),
+      ])},
+      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
+      URL: {finalUrl: 'https://example.com'},
+    };
+
+    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
+    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+
+    expect(results.score).toBe(0);
+    expect(results.displayValue).toBeDisplayString('2 facade alternatives available');
+    expect(results.details.items).toEqual([
+      {
+        productName: 'Intercom Widget',
+        facade: {
+          type: 'link',
+          text: 'React Live Chat Loader',
+          url: 'https://github.com/calibreapp/react-live-chat-loader',
+        },
+        transferSize: 12000,
+        blockingTime: 0,
+        subItems: {type: 'subitems', items: [
+          {
+            url: 'https://js.intercomcdn.com/frame-modern.a.js',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 8000,
+            firstStartTime: 300,
+            firstEndTime: 301,
+          },
+          {
+            url: 'https://widget.intercom.io/widget/1',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 4000,
+            firstStartTime: 200,
+            firstEndTime: 201,
+          },
+        ]},
+      },
+      {
+        productName: 'YouTube Embedded Player',
+        facade: {
+          type: 'link',
+          text: 'Lite YouTube',
+          url: 'https://github.com/paulirish/lite-youtube-embed',
+        },
+        transferSize: 10000,
+        blockingTime: 0,
+        subItems: {type: 'subitems', items: [
+          {
+            url: 'https://i.ytimg.com/b/maxresdefault.jpg',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 7000,
+            firstStartTime: 310,
+            firstEndTime: 311,
+          },
+          {
+            url: 'https://www.youtube.com/embed/2',
+            mainThreadTime: 0,
+            blockingTime: 0,
+            transferSize: 3000,
+            firstStartTime: 210,
+            firstEndTime: 211,
+          },
+        ]},
+      },
+    ]);
+  });
+
   it('handle multiple requests to same product resource', async () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
         resourceEntry(100, 101, 102, 2000, 'https://example.com'),
         // The first product entry is used for the cutoff time
-        facadableProductEntry(200, 201, 202, 2000, '1'),
-        entityResourceEntry(300, 301, 302, 8000, 'a'),
-        facadableProductEntry(400, 401, 402, 2000, '1'),
+        intercomProductEntry(200, 201, 202, 2000, '1'),
+        intercomResourceEntry(300, 301, 302, 8000, 'a'),
+        intercomProductEntry(400, 401, 402, 2000, '1'),
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
       URL: {finalUrl: 'https://example.com'},
@@ -139,13 +227,13 @@ describe('Lazy load third party resources', () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
         resourceEntry(100, 101, 102, 2000, 'https://example.com'),
-        facadableProductEntry(200, 205, 210, 4000, '1'),
+        intercomProductEntry(200, 205, 210, 4000, '1'),
         // Starts between product's startTime and startTime + receiveHeadersEnd, so it is ignored
-        entityResourceEntry(201, 206, 208, 8000, 'a'),
+        intercomResourceEntry(201, 206, 208, 8000, 'a'),
         // Starts between product's startTime + receiveHeadersEnd and endTime, so it is included
-        entityResourceEntry(206, 208, 215, 8000, 'b'),
+        intercomResourceEntry(206, 208, 215, 8000, 'b'),
         // Starts past the cutoff but previous call to same url was before cutoff, so it is ignored
-        entityResourceEntry(300, 301, 303, 8000, 'a'),
+        intercomResourceEntry(300, 301, 303, 8000, 'a'),
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
       URL: {finalUrl: 'https://example.com'},
@@ -192,7 +280,7 @@ describe('Lazy load third party resources', () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
         resourceEntry(100, 101, 102, 2000, 'https://intercomcdn.com'),
-        facadableProductEntry(200, 201, 202, 4000, '1'),
+        intercomProductEntry(200, 201, 202, 4000, '1'),
       ])},
       traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
       URL: {finalUrl: 'https://intercomcdn.com'},
