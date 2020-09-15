@@ -87,7 +87,7 @@ describe('Lazy load third party resources', () => {
     ]);
   });
 
-  it('use first of multiple requests to product resource', async () => {
+  it('handle multiple requests to same product resource', async () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
         {
@@ -268,8 +268,9 @@ describe('Lazy load third party resources', () => {
     });
   });
 
-  it('only reports resources which can be lazy loaded', async () => {
+  it('only reports resources which have facade alternatives', async () => {
     const artifacts = {
+      // This devtools log has third party requests but none have facades
       devtoolsLogs: {defaultPass: pwaDevtoolsLog},
       traces: {defaultPass: pwaTrace},
       URL: {finalUrl: 'https://pwa-rocks.com'},

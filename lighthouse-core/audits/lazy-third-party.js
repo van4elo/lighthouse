@@ -46,8 +46,14 @@ const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 /** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
+/** @typedef {import("third-party-web").IFacade} ThirdPartyFacade*/
 
-/** @typedef {{product: ThirdPartyProduct, cutoffTime: number, urlSummaries: Map<string, ThirdPartySummary.Summary>}} ProductSummary */
+/** @typedef {{
+ *  product: ThirdPartyProduct & {facades: ThirdPartyFacade[]},
+ *  cutoffTime: number,
+ *  urlSummaries: Map<string, ThirdPartySummary.Summary>
+ * }} FacadableProductSummary
+ */
 
 class LazyThirdParty extends Audit {
   /**
@@ -66,20 +72,22 @@ class LazyThirdParty extends Audit {
   /**
    * @param {Map<string, ThirdPartySummary.Summary>} byURL
    * @param {ThirdPartyEntity | undefined} mainEntity
-   * @return {ProductSummary[]}
+   * @return {FacadableProductSummary[]}
    */
-  static getProductSummaries(byURL, mainEntity) {
-    /** @type {Map<string, Map<string, ProductSummary>>} */
+  static getFacadableProductSummaries(byURL, mainEntity) {
+    /** @type {Map<string, Map<string, FacadableProductSummary>>} */
     const entitySummaries = new Map();
 
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
-      const product = thirdPartyWeb.getProduct(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
       const productSummaries = entitySummaries.get(entity.name) || new Map();
+      const product = thirdPartyWeb.getProduct(url);
       if (product && product.facades && product.facades.length) {
         // Record new url if product has a facade.
+
+        /** @type {FacadableProductSummary} */
         const productSummary = productSummaries.get(product.name) || {
           product,
           cutoffTime: Infinity,
@@ -99,10 +107,10 @@ class LazyThirdParty extends Audit {
 
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
-      const product = thirdPartyWeb.getProduct(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
       const productSummaries = entitySummaries.get(entity.name) || new Map();
+      const product = thirdPartyWeb.getProduct(url);
       if (!product || !product.facades || !product.facades.length) {
         // If the url does not have a facade but one or more products on its entity do,
         // we still want to record this url because it was probably fetched by a product with a facade.
@@ -129,7 +137,7 @@ class LazyThirdParty extends Audit {
    * @return {Promise<LH.Audit.Product>}
    */
   static async audit(artifacts, context) {
-    const settings = context.settings || {};
+    const settings = context.settings;
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     const devtoolsLog = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
     const networkRecords = await NetworkRecords.request(devtoolsLog, context);
@@ -140,7 +148,7 @@ class LazyThirdParty extends Audit {
       settings.throttling.cpuSlowdownMultiplier : 1;
     const thirdPartySummaries = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
     const productSummaries
-      = LazyThirdParty.getProductSummaries(thirdPartySummaries.byURL, mainEntity);
+      = LazyThirdParty.getFacadableProductSummaries(thirdPartySummaries.byURL, mainEntity);
 
     const summary = {wastedBytes: 0, wastedMs: 0};
 
@@ -148,7 +156,6 @@ class LazyThirdParty extends Audit {
     const results = [];
     for (const productSummary of productSummaries) {
       const product = productSummary.product;
-      if (!product.facades || !product.facades.length) continue;
 
       // The first facade should always be the best one.
       const bestFacade = product.facades[0];
