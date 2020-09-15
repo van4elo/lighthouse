@@ -348,7 +348,7 @@ module.exports = [
       requestedUrl: 'http://localhost:10200/perf/third-party.html',
       finalUrl: 'http://localhost:10200/perf/third-party.html',
       audits: {
-        'lazy-third-party': {
+        'third-party-facades': {
           score: 0,
           displayValue: '1 facade alternative available',
           details: {

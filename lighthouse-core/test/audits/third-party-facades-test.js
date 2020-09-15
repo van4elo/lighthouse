@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const LazyThirdParty = require('../../audits/lazy-third-party.js');
+const ThirdPartyFacades = require('../../audits/third-party-facades.js');
 const networkRecordsToDevtoolsLog = require('../network-records-to-devtools-log.js');
 const createTestTrace = require('../create-test-trace.js');
 
@@ -46,8 +46,8 @@ function youtubeResourceEntry(startTime, headerEndTime, endTime, transferSize, i
 }
 
 /* eslint-env jest */
-describe('Lazy load third party resources', () => {
-  it('correctly identifies a lazy loadable third party resource', async () => {
+describe('Third party facades audit', () => {
+  it('correctly identifies a third party product with facade alternative', async () => {
     const artifacts = {
       devtoolsLogs: {defaultPass: networkRecordsToDevtoolsLog([
         resourceEntry(100, 101, 102, 2000, 'https://example.com'),
@@ -59,7 +59,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
@@ -109,7 +109,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('2 facade alternatives available');
@@ -187,7 +187,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
@@ -240,7 +240,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
@@ -287,7 +287,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results).toEqual({
       score: 1,
@@ -304,7 +304,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results).toEqual({
       score: 1,
@@ -322,7 +322,7 @@ describe('Lazy load third party resources', () => {
     };
 
     const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await LazyThirdParty.audit(artifacts, {computedCache: new Map(), settings});
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
 
     expect(results).toEqual({
       score: 1,
