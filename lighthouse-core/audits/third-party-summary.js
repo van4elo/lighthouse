@@ -106,11 +106,7 @@ class ThirdPartySummary extends Audit {
     const byURL = new Map();
     /** @type {Map<ThirdPartyEntity, EntitySummary>} */
     const byEntity = new Map();
-    const defaultSummary = {
-      mainThreadTime: 0,
-      blockingTime: 0,
-      transferSize: 0,
-    };
+    const defaultSummary = {mainThreadTime: 0, blockingTime: 0, transferSize: 0};
 
     for (const request of networkRecords) {
       const urlSummary = byURL.get(request.url) ||
