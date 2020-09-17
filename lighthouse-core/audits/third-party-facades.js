@@ -36,8 +36,8 @@ const UIStrings = {
   =1 {# facade alternative available}
   other {# facade alternatives available}
   }`,
-  /** Label for a table column that displays the name of a facade alternative that lazy loads third party resource. Lazy loading means loading resources is deferred until they are needed. */
-  columnFacade: 'Facade Alternative',
+  /** Label for a table column that displays the name of a category that the third party product falls intl. */
+  columnCategory: 'Category',
   /** Label for a table column that displays the name of the third party product that a URL is used for. */
   columnProduct: 'Product',
 };
@@ -49,7 +49,7 @@ const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 /** @typedef {import("third-party-web").IFacade} ThirdPartyFacade*/
 
 /** @typedef {{
- *  product: ThirdPartyProduct & {facades: ThirdPartyFacade[]},
+ *  product: ThirdPartyProduct,
  *  cutoffTime: number,
  *  urlSummaries: Map<string, ThirdPartySummary.Summary>
  * }} FacadableProductSummary
@@ -157,9 +157,6 @@ class ThirdPartyFacades extends Audit {
     for (const productSummary of productSummaries) {
       const product = productSummary.product;
 
-      // The first facade should always be the best one.
-      const bestFacade = product.facades[0];
-
       const items = [];
       let transferSize = 0;
       let blockingTime = 0;
@@ -175,11 +172,7 @@ class ThirdPartyFacades extends Audit {
       summary.wastedMs += blockingTime;
       results.push({
         productName: product.name,
-        facade: /** @type {LH.Audit.Details.LinkValue} */ {
-          type: 'link',
-          text: bestFacade.name,
-          url: bestFacade.repo,
-        },
+        category: product.categories[0],
         transferSize,
         blockingTime,
         subItems: {type: 'subitems', items},
@@ -197,7 +190,7 @@ class ThirdPartyFacades extends Audit {
     const headings = [
       /* eslint-disable max-len */
       {key: 'productName', itemType: 'text', subItemsHeading: {key: 'url', itemType: 'url'}, text: str_(UIStrings.columnProduct)},
-      {key: 'facade', itemType: 'link', text: str_(UIStrings.columnFacade)},
+      {key: 'category', itemType: 'text', text: str_(UIStrings.columnCategory)},
       {key: 'transferSize', granularity: 1, itemType: 'bytes', subItemsHeading: {key: 'transferSize'}, text: str_(i18n.UIStrings.columnTransferSize)},
       {key: 'blockingTime', granularity: 1, itemType: 'ms', subItemsHeading: {key: 'blockingTime'}, text: str_(i18n.UIStrings.columnBlockingTime)},
       /* eslint-enable max-len */
