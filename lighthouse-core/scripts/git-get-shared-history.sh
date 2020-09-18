@@ -10,8 +10,8 @@ set -euo pipefail
 
 # Overview:
 # - build-tracker relies on a common commit that's shared between HEAD and master.
-# - Lighthouse runs on pull_request, not merge, so the checkout is not the branch with shared history, but the result of a merge.
-# - checkout@v2 uses a merge remote (eg. remotes/pull/9605/merge) that just has a single commit. Handy, but there's no history.
+# - Lighthouse runs on pull_request, not push, so the checkout is not the branch with shared history, but the result of a merge.
+# - checkout@v2 uses a merge remote (eg. remotes/pull/9605/merge) that often has just a single commit.
 # - This script creates a new branch that matches the current checkout, but does have a shared history.
 
 # See also
@@ -20,6 +20,7 @@ set -euo pipefail
 
 # We can always use some more history
 git -c protocol.version=2 fetch --deepen=100
+echo "History is deepened."
 
 if git merge-base HEAD origin/master > /dev/null; then
   echo "We have a common commit w/ origin/master. Skipping this script…";
