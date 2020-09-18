@@ -38,12 +38,10 @@ if [[ $checkout_name != remotes/pull/*/merge  ]]; then
 	exit 0;
 fi
 
+# Extract 9605 from 'remotes/pull/9605/merge'
 pr_num=${checkout_name//[!0-9]/}
 
-echo "hi $pr_num"
-
-
-lsremote_hash=$(git ls-remote origin refs/pull/$pr_num/head | cut -f1)
+lsremote_hash=$(git ls-remote origin "refs/pull/$pr_num/head" | cut -f1)
 
 if [ -z "$lsremote_hash" ]; then
 	echo "ls-remote failed to find this PR's branch. 🤔 Bailing.";
@@ -55,13 +53,13 @@ git checkout --progress --force "$lsremote_hash"
 
 # Branch off, for safekeeping
 mergebranch_name="_bt_mergebranch-$pr_num"
-git checkout -b $mergebranch_name
+git checkout -b "$mergebranch_name"
 
 
 git merge --no-verify -m "Merge remote-tracking branch 'origin/master' into $mergebranch_name" origin/master
 
 # If there's a diff aginst where we started.. we fucked up
-if git --no-pager diff --color=always --exit-code $checkout_name > /dev/null; then
+if git --no-pager diff --color=always --exit-code "$checkout_name" > /dev/null; then
 	echo "No diff, good!"
 else
 	echo "Unexpected difference between $mergebranch_name and $checkout_name. Bailing";
