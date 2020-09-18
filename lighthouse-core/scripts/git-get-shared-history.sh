@@ -19,7 +19,7 @@ set -euo pipefail
 # - https://github.com/paularmstrong/build-tracker/issues/200
 
 # We can always use some more history
-git fetch --deepen=100
+git -c protocol.version=2 fetch --deepen=100
 
 if git merge-base HEAD origin/master > /dev/null; then
   echo "We have a common commit w/ origin/master. Skipping this script…";
