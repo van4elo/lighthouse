@@ -22,10 +22,10 @@ set -euo pipefail
 git fetch --deepen=100
 
 if git merge-base HEAD origin/master > /dev/null; then
-	echo "We have a common commit w/ origin/master. Skipping this script…";
-	exit 0
+  echo "We have a common commit w/ origin/master. Skipping this script…";
+  exit 0
 else
-	echo "We don't have a common commit w/ origin/master. We'll checkout the associated branch, merge master, and then we'll be good"
+  echo "We don't have a common commit w/ origin/master. We'll checkout the associated branch, merge master, and then we'll be good"
 fi
 
 # get the human readable remote name
@@ -34,8 +34,8 @@ checkout_name=$(git describe --all --exact-match HEAD)
 
 # We only want to keep going if it's a 'remotes/pull/{*}/merge'
 if [[ $checkout_name != remotes/pull/*/merge  ]]; then
-	echo "Don't know how to handle this checkout ($checkout_name). 🤔 Bailing.";
-	exit 0;
+  echo "Don't know how to handle this checkout ($checkout_name). 🤔 Bailing.";
+  exit 0;
 fi
 
 # Extract 9605 from 'remotes/pull/9605/merge'
@@ -44,8 +44,8 @@ pr_num=${checkout_name//[!0-9]/}
 lsremote_hash=$(git ls-remote origin "refs/pull/$pr_num/head" | cut -f1)
 
 if [ -z "$lsremote_hash" ]; then
-	echo "ls-remote failed to find this PR's branch. 🤔 Bailing.";
-	exit 0;
+  echo "ls-remote failed to find this PR's branch. 🤔 Bailing.";
+  exit 0;
 fi
 
 # Checkout our PR branch
@@ -60,15 +60,15 @@ git merge --no-verify -m "Merge remote-tracking branch 'origin/master' into $mer
 
 # If there's a diff aginst where we started.. we fucked up
 if git --no-pager diff --color=always --exit-code "$checkout_name" > /dev/null; then
-	echo "No diff, good!"
+  echo "No diff, good!"
 else
-	echo "Unexpected difference between $mergebranch_name and $checkout_name. Bailing";
-	exit 0;
+  echo "Unexpected difference between $mergebranch_name and $checkout_name. Bailing";
+  exit 0;
 fi
 
 # Lastly, now we should definitely have a merge-base.
 if git merge-base HEAD origin/master > /dev/null; then
-	echo "Merge-base found. Perfect. 👌"
+  echo "Merge-base found. Perfect. 👌"
 else
-	echo "No diff, but still no merge-base. Very unexpected. 🤔"
+  echo "No diff, but still no merge-base. Very unexpected. 🤔"
 fi
