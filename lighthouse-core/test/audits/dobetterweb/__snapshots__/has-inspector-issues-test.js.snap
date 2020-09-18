@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Has inspector issues audit lists the correct description with the associated issue type 1`] = `
+Array [
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | mixedContentMessage # 0",
+    "issueType": "MixedContent",
+    "requestUrl": "www.mixedcontent.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | sameSiteMessage # 0",
+    "issueType": "SameSiteCookie",
+    "requestUrl": "www.samesitecookies.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepResourceBlockedMessage # 0",
+    "issueType": "BlockedByResponse",
+    "requestUrl": "www.blockedbyresponse.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coopIframeBlockedMessage # 0",
+    "issueType": "BlockedByResponse",
+    "requestUrl": "www.blockedbyresponse.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepFrameBlockedMessage # 0",
+    "issueType": "BlockedByResponse",
+    "requestUrl": "www.blockedbyresponse.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepResourceBlockedMessage # 0",
+    "issueType": "BlockedByResponse",
+    "requestUrl": "www.blockedbyresponse.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepResourceBlockedMessage # 0",
+    "issueType": "BlockedByResponse",
+    "requestUrl": "www.blockedbyresponse.com",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsNetworkLimitMessage # 0",
+    "issueType": "HeavyAds",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsCPUTotalLimitMessage # 0",
+    "issueType": "HeavyAds",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsCPUPeakLimitMessage # 0",
+    "issueType": "HeavyAds",
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspInlineViolationMessage # 0",
+    "issueType": "ContentSecurityPolicy",
+    "requestUrl": undefined,
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspEvalViolationMessage # 0",
+    "issueType": "ContentSecurityPolicy",
+    "requestUrl": undefined,
+  },
+  Object {
+    "description": "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspUrlViolationMessage # 0",
+    "issueType": "ContentSecurityPolicy",
+    "requestUrl": undefined,
+  },
+]
+`;

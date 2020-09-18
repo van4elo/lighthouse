@@ -665,6 +665,51 @@
   "lighthouse-core/audits/dobetterweb/geolocation-on-start.js | title": {
     "message": "Âv́ôíd̂ś r̂éq̂úêśt̂ín̂ǵ t̂h́ê ǵêól̂óĉát̂íôń p̂ér̂ḿîśŝíôń ôń p̂áĝé l̂óâd́"
   },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepFrameBlockedMessage": {
+    "message": "Â f́r̂ám̂é ŵáŝ b́l̂óĉḱêd́ d̂úê t́ô ńôt́ b̂éîńĝ ál̂ĺôẃêd́ b̂ý â `Cross-Origin Embedder Policy`"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepResourceBlockedMessage": {
+    "message": "Â ŕêśôúr̂ćê ẃâś b̂ĺôćk̂éd̂ d́ûé t̂ó n̂ót̂ b́êín̂ǵ âĺl̂óŵéd̂ b́ŷ á `Cross-Origin Embedder Policy`"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | columnIssueType": {
+    "message": "Îśŝúê"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coopIframeBlockedMessage": {
+    "message": "Âń îf́r̂ám̂é n̂áv̂íĝát̂íôń t̂ó â d́ôćûḿêńt̂ ẃît́ĥ á `Cross-Origin Opener Policy` ŵáŝ b́l̂óĉḱêd́"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspEvalViolationMessage": {
+    "message": "T̂h́ê `Content Security Policy` óf̂ t́ĥé ŝít̂é b̂ĺôćk̂ś t̂h́ê úŝé ôf́ `eval` îń Ĵáv̂áŜćr̂íp̂t́"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspInlineViolationMessage": {
+    "message": "T̂h́ê `Content Security Policy` óf̂ t́ĥé p̂áĝé b̂ĺôćk̂ś îńl̂ín̂é êx́êćût́îón̂ óf̂ śĉŕîṕt̂ś âńd̂ śt̂ýl̂éŝh́êét̂ś"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspUrlViolationMessage": {
+    "message": "T̂h́ê `Content Security Policy` óf̂ t́ĥé p̂áĝé b̂ĺôćk̂ś ŝóm̂é r̂éŝóûŕĉéŝ b́êćâúŝé t̂h́êír̂ ór̂íĝín̂ íŝ ńôt́ îńĉĺûd́êd́ îń t̂h́ê ćôńt̂én̂t́ ŝéĉúr̂ít̂ý p̂ól̂íĉý ĥéâd́êŕ"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | description": {
+    "message": "Îśŝúêś l̂óĝǵêd́ t̂ó t̂h́ê `Issues` ṕâńêĺ îń Ĉh́r̂óm̂é D̂év̂t́ôól̂ś îńd̂íĉát̂é ûńr̂éŝól̂v́êd́ p̂ŕôb́l̂ém̂ś. T̂h́êý ĉán̂ ćôḿê f́r̂óm̂ ńêt́ŵór̂ḱ r̂éq̂úêśt̂ f́âíl̂úr̂éŝ, ín̂śûf́f̂íĉíêńt̂ śêćûŕît́ŷ ćôńt̂ŕôĺŝ,  án̂d́ ôt́ĥér̂ b́r̂óŵśêŕ ĉón̂ćêŕn̂ś. "
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | failureTitle": {
+    "message": "Îśŝúêś ŵér̂é l̂óĝǵêd́ îń t̂h́ê `Issues` ṕâńêĺ îń Ĉh́r̂óm̂é D̂év̂t́ôól̂ś"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsCPUPeakLimitMessage": {
+    "message": "T̂h́ê ṕâǵê ćôńt̂áîńŝ ád̂ś t̂h́ât́ ûśê t́ĥé m̂áîń t̂h́r̂éâd́ f̂ór̂ ḿôŕê t́ĥán̂ 15 śêćôńd̂ś îń â 30 śêćôńd̂ ẃîńd̂óŵ"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsCPUTotalLimitMessage": {
+    "message": "T̂h́ê ṕâǵê ćôńt̂áîńŝ ád̂ś t̂h́ât́ ûśê t́ĥé m̂áîń t̂h́r̂éâd́ f̂ór̂ ḿôŕê t́ĥán̂ 60 śêćôńd̂ś îń t̂ót̂ál̂"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsNetworkLimitMessage": {
+    "message": "T̂h́ê ṕâǵê ćôńt̂áîńŝ ád̂ś t̂h́ât́ ûśê ḿôŕê t́ĥán̂ 4 ḿêǵâb́ŷt́êś ôf́ n̂ét̂ẃôŕk̂ b́âńd̂ẃîd́t̂h́"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | mixedContentMessage": {
+    "message": "Ŝóm̂é r̂éŝóûŕĉéŝ ĺîḱê ím̂áĝéŝ, śt̂ýl̂éŝh́êét̂ś ôŕ ŝćr̂íp̂t́ŝ ár̂é b̂éîńĝ áĉćêśŝéd̂ óv̂ér̂ án̂ ín̂śêćûŕê `HTTP` ćôńn̂éĉt́îón̂"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | sameSiteMessage": {
+    "message": "Â ćôók̂íê'ś [`SameSite`] ât́t̂ŕîb́ût́ê ẃâś n̂ót̂ śêt́ ôŕ îś îńv̂ál̂íd̂"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | title": {
+    "message": "N̂ó îśŝúêś îń t̂h́ê `Issues` ṕâńêĺ îń Ĉh́r̂óm̂é D̂év̂t́ôól̂ś"
+  },
   "lighthouse-core/audits/dobetterweb/js-libraries.js | columnVersion": {
     "message": "V̂ér̂śîón̂"
   },
@@ -751,9 +796,6 @@
   },
   "lighthouse-core/audits/dobetterweb/uses-passive-event-listeners.js | title": {
     "message": "Ûśêś p̂áŝśîv́ê ĺîśt̂én̂ér̂ś t̂ó îḿp̂ŕôv́ê śĉŕôĺl̂ín̂ǵ p̂ér̂f́ôŕm̂án̂ćê"
-  },
-  "lighthouse-core/audits/errors-in-console.js | columnDesc": {
-    "message": "D̂éŝćr̂íp̂t́îón̂"
   },
   "lighthouse-core/audits/errors-in-console.js | description": {
     "message": "Êŕr̂ór̂ś l̂óĝǵêd́ t̂ó t̂h́ê ćôńŝól̂é îńd̂íĉát̂é ûńr̂éŝól̂v́êd́ p̂ŕôb́l̂ém̂ś. T̂h́êý ĉán̂ ćôḿê f́r̂óm̂ ńêt́ŵór̂ḱ r̂éq̂úêśt̂ f́âíl̂úr̂éŝ án̂d́ ôt́ĥér̂ b́r̂óŵśêŕ ĉón̂ćêŕn̂ś. [L̂éâŕn̂ ḿôŕê](https://web.dev/errors-in-console/)"
@@ -1606,6 +1648,9 @@
   },
   "lighthouse-core/lib/i18n/i18n.js | columnCacheTTL": {
     "message": "Ĉáĉh́ê T́T̂Ĺ"
+  },
+  "lighthouse-core/lib/i18n/i18n.js | columnDescription": {
+    "message": "D̂éŝćr̂íp̂t́îón̂"
   },
   "lighthouse-core/lib/i18n/i18n.js | columnDuration": {
     "message": "D̂úr̂át̂íôń"

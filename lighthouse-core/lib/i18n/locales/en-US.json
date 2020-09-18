@@ -665,6 +665,51 @@
   "lighthouse-core/audits/dobetterweb/geolocation-on-start.js | title": {
     "message": "Avoids requesting the geolocation permission on page load"
   },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepFrameBlockedMessage": {
+    "message": "A frame was blocked due to not being allowed by a `Cross-Origin Embedder Policy`"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coepResourceBlockedMessage": {
+    "message": "A resource was blocked due to not being allowed by a `Cross-Origin Embedder Policy`"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | columnIssueType": {
+    "message": "Issue"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | coopIframeBlockedMessage": {
+    "message": "An iframe navigation to a document with a `Cross-Origin Opener Policy` was blocked"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspEvalViolationMessage": {
+    "message": "The `Content Security Policy` of the site blocks the use of `eval` in JavaScript"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspInlineViolationMessage": {
+    "message": "The `Content Security Policy` of the page blocks inline execution of scripts and stylesheets"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | cspUrlViolationMessage": {
+    "message": "The `Content Security Policy` of the page blocks some resources because their origin is not included in the content security policy header"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | description": {
+    "message": "Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls,  and other browser concerns. "
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | failureTitle": {
+    "message": "Issues were logged in the `Issues` panel in Chrome Devtools"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsCPUPeakLimitMessage": {
+    "message": "The page contains ads that use the main thread for more than 15 seconds in a 30 second window"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsCPUTotalLimitMessage": {
+    "message": "The page contains ads that use the main thread for more than 60 seconds in total"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | heavyAdsNetworkLimitMessage": {
+    "message": "The page contains ads that use more than 4 megabytes of network bandwidth"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | mixedContentMessage": {
+    "message": "Some resources like images, stylesheets or scripts are being accessed over an insecure `HTTP` connection"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | sameSiteMessage": {
+    "message": "A cookie's [`SameSite`] attribute was not set or is invalid"
+  },
+  "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | title": {
+    "message": "No issues in the `Issues` panel in Chrome Devtools"
+  },
   "lighthouse-core/audits/dobetterweb/js-libraries.js | columnVersion": {
     "message": "Version"
   },
@@ -751,9 +796,6 @@
   },
   "lighthouse-core/audits/dobetterweb/uses-passive-event-listeners.js | title": {
     "message": "Uses passive listeners to improve scrolling performance"
-  },
-  "lighthouse-core/audits/errors-in-console.js | columnDesc": {
-    "message": "Description"
   },
   "lighthouse-core/audits/errors-in-console.js | description": {
     "message": "Errors logged to the console indicate unresolved problems. They can come from network request failures and other browser concerns. [Learn more](https://web.dev/errors-in-console/)"
@@ -1606,6 +1648,9 @@
   },
   "lighthouse-core/lib/i18n/i18n.js | columnCacheTTL": {
     "message": "Cache TTL"
+  },
+  "lighthouse-core/lib/i18n/i18n.js | columnDescription": {
+    "message": "Description"
   },
   "lighthouse-core/lib/i18n/i18n.js | columnDuration": {
     "message": "Duration"
