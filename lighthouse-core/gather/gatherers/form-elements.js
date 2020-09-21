@@ -48,7 +48,8 @@ function collectFormElements() {
       forms.set(parentFormElement, newFormObj);
     }
     const formObj = forms.get(parentFormElement) || formlessObj;
-
+    // @ts-expect-error - getNodeDetails put into scope via stringification
+    const nodeDetails = getNodeDetails(child);
     if (child instanceof HTMLInputElement || child instanceof HTMLTextAreaElement
       || child instanceof HTMLSelectElement) {
       formObj.inputs.push({
@@ -60,15 +61,17 @@ function collectFormElements() {
           attribute: child.getAttribute('autocomplete'),
           prediction: child.getAttribute('autofill-prediction'),
         },
-        // @ts-expect-error - getNodeDetails put into scope via stringification
-        node: getNodeDetails(child),
+        nodeLabel: nodeDetails.nodeLabel,
+        snippet: nodeDetails.snippet,
       });
     }
     if (child instanceof HTMLLabelElement) {
+      // @ts-expect-error - getNodeDetails put into scope via stringification
+      const nodeDetails = getNodeDetails(child);
       formObj.labels.push({
         for: child.htmlFor,
-        // @ts-expect-error - getNodeDetails put into scope via stringification
-        node: getNodeDetails(child),
+        nodeLabel: nodeDetails.nodeLabel,
+        snippet: nodeDetails.snippet,
       });
     }
   }
