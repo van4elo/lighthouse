@@ -171,9 +171,11 @@ class ThirdPartyFacades extends Audit {
       const categoryTemplate = CATEGORY_UI_MAP.get(product.categories[0]);
 
       // Display product name with category next to it in the same column
-      let productWithCategory = product.name;
+      let productWithCategory;
       if (categoryTemplate) {
         productWithCategory = str_(categoryTemplate, {productName: product.name});
+      } else {
+        productWithCategory = product.name;
       }
 
       const items = [];
