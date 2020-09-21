@@ -11,6 +11,8 @@ const assert = require('assert').strict;
 
 const URL = 'https://google.com/test';
 
+const node = {};
+
 /* eslint-env jest */
 
 describe('External anchors use rel="noopener"', () => {
@@ -82,13 +84,17 @@ describe('External anchors use rel="noopener"', () => {
           href: 'https://example.com/test',
           target: '_blank',
           rel: 'nofollow',
-          devtoolsNodePath: 'devtools',
+          node: {
+            devtoolsNodePath: 'devtools',
+          },
         },
         {
           href: 'https://example.com/test1',
           target: '_blank',
           rel: '',
-          devtoolsNodePath: 'nodepath',
+          node: {
+            devtoolsNodePath: 'nodepath',
+          },
         },
       ],
       URL: {finalUrl: URL},
@@ -103,7 +109,7 @@ describe('External anchors use rel="noopener"', () => {
 
   it('fails when links have no href attribute', () => {
     const auditResult = ExternalAnchorsAudit.audit({
-      AnchorElements: [{href: '', target: '_blank', rel: ''}],
+      AnchorElements: [{href: '', target: '_blank', rel: '', node}],
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.score, 0);
@@ -114,10 +120,10 @@ describe('External anchors use rel="noopener"', () => {
   it('fails when links have href attribute starting with a protocol', () => {
     const auditResult = ExternalAnchorsAudit.audit({
       AnchorElements: [
-        {href: 'http://', target: '_blank', rel: ''},
-        {href: 'http:', target: '_blank', rel: ''},
-        {href: 'https://', target: '_blank', rel: ''},
-        {href: 'https:', target: '_blank', rel: ''},
+        {href: 'http://', target: '_blank', rel: '', node},
+        {href: 'http:', target: '_blank', rel: '', node},
+        {href: 'https://', target: '_blank', rel: '', node},
+        {href: 'https:', target: '_blank', rel: '', node},
       ],
       URL: {finalUrl: URL},
     });

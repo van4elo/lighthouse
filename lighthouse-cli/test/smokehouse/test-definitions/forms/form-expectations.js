@@ -18,9 +18,11 @@ const expectations = [
             id: 'checkout',
             name: 'checkout',
             autocomplete: 'on',
-            nodeLabel:
+            node: {
+              nodeLabel:
               'Name on card: \nCredit card number: \nExpiry Date: \nMM\n01\n02\n03\n04\n05\n06\n07\n08\n09…',
-            snippet: '<form id="checkout" name="checkout" action="../done.html" method="post">',
+              snippet: '<form id="checkout" name="checkout" action="../done.html" method="post">',
+            },
           },
           inputs: [
             {

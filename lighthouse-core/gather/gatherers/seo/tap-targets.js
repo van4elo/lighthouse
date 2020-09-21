@@ -272,7 +272,7 @@ function gatherTapTargets() {
       clientRects: visibleClientRects,
       href: /** @type {HTMLAnchorElement} */(tapTargetElement)['href'] || '',
       // @ts-expect-error - getNodeDetails put into scope via stringification
-      ...getNodeDetails(tapTargetElement),
+      node: getNodeDetails(tapTargetElement),
     });
   }
 

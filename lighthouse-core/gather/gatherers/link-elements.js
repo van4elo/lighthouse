@@ -71,7 +71,7 @@ function getLinkElementsInDOM() {
       hrefRaw,
       source,
       // @ts-expect-error - put into scope via stringification
-      ...getNodeDetails(link),
+      node: getNodeDetails(link),
     });
   }
 
@@ -112,6 +112,13 @@ class LinkElements extends Gatherer {
       if (header.name.toLowerCase() !== 'link') continue;
 
       for (const link of LinkHeader.parse(header.value).refs) {
+        const node = {
+          devtoolsNodePath: '',
+          selector: '',
+          nodeLabel: '',
+          boundingRect: null,
+          snippet: '',
+        };
         linkElements.push({
           rel: link.rel || '',
           href: normalizeUrlOrNull(link.uri, finalUrl),
@@ -120,11 +127,7 @@ class LinkElements extends Gatherer {
           as: link.as || '',
           crossOrigin: getCrossoriginFromHeader(link.crossorigin),
           source: 'headers',
-          devtoolsNodePath: '',
-          selector: '',
-          nodeLabel: '',
-          boundingRect: null,
-          snippet: '',
+          node,
         });
       }
     }

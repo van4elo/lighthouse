@@ -23,11 +23,13 @@ describe('Link Elements gatherer', () => {
       hreflang: '',
       as: '',
       crossOrigin: null,
-      devtoolsNodePath: '',
-      nodeLabel: '',
-      snippet: '',
-      boundingRect: null,
-      selector: '',
+      node: {
+        devtoolsNodePath: '',
+        nodeLabel: '',
+        snippet: '',
+        boundingRect: null,
+        selector: '',
+      },
       ...overrides,
     };
   }

@@ -40,7 +40,7 @@ function collectFormElements() {
           name: parentFormElement.name,
           autocomplete: parentFormElement.autocomplete,
           // @ts-expect-error - getNodeDetails put into scope via stringification
-          ...getNodeDetails(parentFormElement),
+          node: getNodeDetails(parentFormElement),
         },
         inputs: [],
         labels: [],
@@ -61,14 +61,14 @@ function collectFormElements() {
           prediction: child.getAttribute('autofill-prediction'),
         },
         // @ts-expect-error - getNodeDetails put into scope via stringification
-        ...getNodeDetails(child),
+        node: getNodeDetails(child),
       });
     }
     if (child instanceof HTMLLabelElement) {
       formObj.labels.push({
         for: child.htmlFor,
         // @ts-expect-error - getNodeDetails put into scope via stringification
-        ...getNodeDetails(child),
+        node: getNodeDetails(child),
       });
     }
   }
