@@ -365,12 +365,7 @@ module.exports = [
           details: {
             items: [
               {
-                productName: 'YouTube Embedded Player',
-                facade: {
-                  type: 'link',
-                  text: 'Lite YouTube',
-                  url: 'https://github.com/paulirish/lite-youtube-embed',
-                },
+                product: 'YouTube Embedded Player (Video)',
                 blockingTime: 0,
                 transferSize: '651128 +/- 100000',
                 subItems: {

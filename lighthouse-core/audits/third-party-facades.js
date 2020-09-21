@@ -36,13 +36,25 @@ const UIStrings = {
   =1 {# facade alternative available}
   other {# facade alternatives available}
   }`,
-  /** Label for a table column that displays the name of a category that the third party product falls intl. */
-  columnCategory: 'Category',
   /** Label for a table column that displays the name of the third party product that a URL is used for. */
   columnProduct: 'Product',
+  /**
+   * @description Template for an entry in the "Product" column for a third party product which is in the video category.
+   * @example {YouTube Embed} productName
+   */
+  categoryVideo: '{productName} (Video)',
+  /**
+   * @description Template for an entry in the "Product" column for a third party product which is in the customer success category.
+   * @example {Intercom Widget} productName
+   */
+  categoryCustomerSuccess: '{productName} (Customer Success)',
 };
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
+const CATEGORY_UI_MAP = new Map([
+  ['video', UIStrings.categoryVideo],
+  ['customer-success', UIStrings.categoryCustomerSuccess],
+]);
 
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 /** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
@@ -156,6 +168,13 @@ class ThirdPartyFacades extends Audit {
     const results = [];
     for (const productSummary of productSummaries) {
       const product = productSummary.product;
+      const categoryTemplate = CATEGORY_UI_MAP.get(product.categories[0]);
+
+      // Display product name with category next to it in the same column
+      let productWithCategory = product.name;
+      if (categoryTemplate) {
+        productWithCategory = str_(categoryTemplate, {productName: product.name});
+      }
 
       const items = [];
       let transferSize = 0;
@@ -171,8 +190,7 @@ class ThirdPartyFacades extends Audit {
       summary.wastedBytes += transferSize;
       summary.wastedMs += blockingTime;
       results.push({
-        productName: product.name,
-        category: product.categories[0],
+        product: productWithCategory,
         transferSize,
         blockingTime,
         subItems: {type: 'subitems', items},
@@ -189,8 +207,7 @@ class ThirdPartyFacades extends Audit {
     /** @type {LH.Audit.Details.Table['headings']} */
     const headings = [
       /* eslint-disable max-len */
-      {key: 'productName', itemType: 'text', subItemsHeading: {key: 'url', itemType: 'url'}, text: str_(UIStrings.columnProduct)},
-      {key: 'category', itemType: 'text', text: str_(UIStrings.columnCategory)},
+      {key: 'product', itemType: 'text', subItemsHeading: {key: 'url', itemType: 'url'}, text: str_(UIStrings.columnProduct)},
       {key: 'transferSize', granularity: 1, itemType: 'bytes', subItemsHeading: {key: 'transferSize'}, text: str_(i18n.UIStrings.columnTransferSize)},
       {key: 'blockingTime', granularity: 1, itemType: 'ms', subItemsHeading: {key: 'blockingTime'}, text: str_(i18n.UIStrings.columnBlockingTime)},
       /* eslint-enable max-len */

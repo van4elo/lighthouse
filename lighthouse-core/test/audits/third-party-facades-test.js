@@ -67,14 +67,10 @@ describe('Third party facades audit', () => {
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
-    expect(results.details.items).toEqual([
+    expect(results.details.items[0].product)
+      .toBeDisplayString('Intercom Widget (Customer Success)');
+    expect(results.details.items).toMatchObject([
       {
-        productName: 'Intercom Widget',
-        facade: {
-          type: 'link',
-          text: 'React Live Chat Loader',
-          url: 'https://github.com/calibreapp/react-live-chat-loader',
-        },
         transferSize: 12000,
         blockingTime: 0,
         subItems: {
@@ -122,14 +118,11 @@ describe('Third party facades audit', () => {
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('2 facade alternatives available');
-    expect(results.details.items).toEqual([
+    expect(results.details.items[0].product)
+      .toBeDisplayString('Intercom Widget (Customer Success)');
+    expect(results.details.items[1].product).toBeDisplayString('YouTube Embedded Player (Video)');
+    expect(results.details.items).toMatchObject([
       {
-        productName: 'Intercom Widget',
-        facade: {
-          type: 'link',
-          text: 'React Live Chat Loader',
-          url: 'https://github.com/calibreapp/react-live-chat-loader',
-        },
         transferSize: 12000,
         blockingTime: 0,
         subItems: {
@@ -155,12 +148,6 @@ describe('Third party facades audit', () => {
         },
       },
       {
-        productName: 'YouTube Embedded Player',
-        facade: {
-          type: 'link',
-          text: 'Lite YouTube',
-          url: 'https://github.com/paulirish/lite-youtube-embed',
-        },
         transferSize: 10000,
         blockingTime: 0,
         subItems: {
@@ -208,14 +195,10 @@ describe('Third party facades audit', () => {
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
-    expect(results.details.items).toEqual([
+    expect(results.details.items[0].product)
+      .toBeDisplayString('Intercom Widget (Customer Success)');
+    expect(results.details.items).toMatchObject([
       {
-        productName: 'Intercom Widget',
-        facade: {
-          type: 'link',
-          text: 'React Live Chat Loader',
-          url: 'https://github.com/calibreapp/react-live-chat-loader',
-        },
         transferSize: 12000,
         blockingTime: 0,
         subItems: {
@@ -266,14 +249,10 @@ describe('Third party facades audit', () => {
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('1 facade alternative available');
-    expect(results.details.items).toEqual([
+    expect(results.details.items[0].product)
+      .toBeDisplayString('Intercom Widget (Customer Success)');
+    expect(results.details.items).toMatchObject([
       {
-        productName: 'Intercom Widget',
-        facade: {
-          type: 'link',
-          text: 'React Live Chat Loader',
-          url: 'https://github.com/calibreapp/react-live-chat-loader',
-        },
         transferSize: 12000,
         blockingTime: 0,
         subItems: {
@@ -371,16 +350,13 @@ describe('Third party facades audit', () => {
 
     expect(results.score).toBe(0);
     expect(results.displayValue).toBeDisplayString('2 facade alternatives available');
-    expect(results.details.items).toEqual(
+    expect(results.details.items[0].product).toBeDisplayString('YouTube Embedded Player (Video)');
+    expect(results.details.items[1].product).toBeDisplayString('Vimeo Embedded Player (Video)');
+    expect(results.details.items).toMatchObject(
       [
         {
+          transferSize: 651350,
           blockingTime: 0,
-          facade: {
-            text: 'Lite YouTube',
-            type: 'link',
-            url: 'https://github.com/paulirish/lite-youtube-embed',
-          },
-          productName: 'YouTube Embedded Player',
           subItems: {
             items: [
               {
@@ -450,16 +426,10 @@ describe('Third party facades audit', () => {
             ],
             type: 'subitems',
           },
-          transferSize: 651350,
         },
         {
+          transferSize: 184495,
           blockingTime: 0,
-          facade: {
-            text: 'Lite Vimeo',
-            type: 'link',
-            url: 'https://github.com/slightlyoff/lite-vimeo',
-          },
-          productName: 'Vimeo Embedded Player',
           subItems: {
             items: [
               {
@@ -537,7 +507,6 @@ describe('Third party facades audit', () => {
             ],
             type: 'subitems',
           },
-          transferSize: 184495,
         },
       ]
     );

@@ -1313,8 +1313,11 @@
   "lighthouse-core/audits/themed-omnibox.js | title": {
     "message": "Ŝét̂ś â t́ĥém̂é ĉól̂ór̂ f́ôŕ t̂h́ê ád̂d́r̂éŝś b̂ár̂."
   },
-  "lighthouse-core/audits/third-party-facades.js | columnFacade": {
-    "message": "F̂áĉád̂é Âĺt̂ér̂ńât́îv́ê"
+  "lighthouse-core/audits/third-party-facades.js | categoryCustomerSuccess": {
+    "message": "{productName} (Ĉúŝt́ôḿêŕ Ŝúĉćêśŝ)"
+  },
+  "lighthouse-core/audits/third-party-facades.js | categoryVideo": {
+    "message": "{productName} (V̂íd̂éô)"
   },
   "lighthouse-core/audits/third-party-facades.js | columnProduct": {
     "message": "P̂ŕôd́ûćt̂"

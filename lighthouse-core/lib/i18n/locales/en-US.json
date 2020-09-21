@@ -1313,8 +1313,11 @@
   "lighthouse-core/audits/themed-omnibox.js | title": {
     "message": "Sets a theme color for the address bar."
   },
-  "lighthouse-core/audits/third-party-facades.js | columnFacade": {
-    "message": "Facade Alternative"
+  "lighthouse-core/audits/third-party-facades.js | categoryCustomerSuccess": {
+    "message": "{productName} (Customer Success)"
+  },
+  "lighthouse-core/audits/third-party-facades.js | categoryVideo": {
+    "message": "{productName} (Video)"
   },
   "lighthouse-core/audits/third-party-facades.js | columnProduct": {
     "message": "Product"
