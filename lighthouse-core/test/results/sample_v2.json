@@ -1778,7 +1778,7 @@
     "third-party-facades": {
       "id": "third-party-facades",
       "title": "Lazy load third-party resources with facade alternatives",
-      "description": "Some third-party resources can be fetched after the page loads. These third-party resources are used by embedded elements which can be replaced by a facade until the user needs to use them. [Learn more](https://web.dev/efficiently-load-third-party-javascript/).",
+      "description": "Some third party embeds can be lazy loaded. Consider replacing them with a facade until they are required. [Learn more](https://web.dev/efficiently-load-third-party-javascript/).",
       "score": null,
       "scoreDisplayMode": "notApplicable"
     },

@@ -1323,7 +1323,7 @@
     "message": "P̂ŕôd́ûćt̂"
   },
   "lighthouse-core/audits/third-party-facades.js | description": {
-    "message": "Ŝóm̂é t̂h́îŕd̂-ṕâŕt̂ý r̂éŝóûŕĉéŝ ćâń b̂é f̂ét̂ćĥéd̂ áf̂t́êŕ t̂h́ê ṕâǵê ĺôád̂ś. T̂h́êśê t́ĥír̂d́-p̂ár̂t́ŷ ŕêśôúr̂ćêś âŕê úŝéd̂ b́ŷ ém̂b́êd́d̂éd̂ él̂ém̂én̂t́ŝ ẃĥíĉh́ ĉán̂ b́ê ŕêṕl̂áĉéd̂ b́ŷ á f̂áĉád̂é ûńt̂íl̂ t́ĥé ûśêŕ n̂éêd́ŝ t́ô úŝé t̂h́êḿ. [L̂éâŕn̂ ḿôŕê](https://web.dev/efficiently-load-third-party-javascript/)."
+    "message": "Ŝóm̂é t̂h́îŕd̂ ṕâŕt̂ý êḿb̂éd̂ś ĉán̂ b́ê ĺâźŷ ĺôád̂éd̂. Ćôńŝíd̂ér̂ ŕêṕl̂áĉín̂ǵ t̂h́êḿ ŵít̂h́ â f́âćâd́ê ún̂t́îĺ t̂h́êý âŕê ŕêq́ûír̂éd̂. [Ĺêár̂ń m̂ór̂é](https://web.dev/efficiently-load-third-party-javascript/)."
   },
   "lighthouse-core/audits/third-party-facades.js | displayValue": {
     "message": "{itemCount, plural,\n  =1 {# f̂áĉád̂é âĺt̂ér̂ńât́îv́ê áv̂áîĺâb́l̂é}\n  other {# f̂áĉád̂é âĺt̂ér̂ńât́îv́êś âv́âíl̂áb̂ĺê}\n  }"
