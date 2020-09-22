@@ -1316,6 +1316,12 @@
   "lighthouse-core/audits/third-party-facades.js | categoryCustomerSuccess": {
     "message": "{productName} (Ĉúŝt́ôḿêŕ Ŝúĉćêśŝ)"
   },
+  "lighthouse-core/audits/third-party-facades.js | categoryMarketing": {
+    "message": "{productName} (M̂ár̂ḱêt́îńĝ)"
+  },
+  "lighthouse-core/audits/third-party-facades.js | categorySocial": {
+    "message": "{productName} (Ŝóĉíâĺ)"
+  },
   "lighthouse-core/audits/third-party-facades.js | categoryVideo": {
     "message": "{productName} (V̂íd̂éô)"
   },

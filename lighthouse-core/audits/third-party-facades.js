@@ -39,7 +39,7 @@ const UIStrings = {
   columnProduct: 'Product',
   /**
    * @description Template for an entry in the "Product" column for a third party product which is in the video category.
-   * @example {YouTube Embed} productName
+   * @example {YouTube Embedded Player} productName
    */
   categoryVideo: '{productName} (Video)',
   /**
@@ -47,12 +47,24 @@ const UIStrings = {
    * @example {Intercom Widget} productName
    */
   categoryCustomerSuccess: '{productName} (Customer Success)',
+  /**
+   * @description Template for an entry in the "Product" column for a third party product which is in the marketing category.
+   * @example {Drift Live Chat} productName
+   */
+  categoryMarketing: '{productName} (Marketing)',
+  /**
+   * @description Template for an entry in the "Product" column for a third party product which is in the social category.
+   * @example {Facebook Messenger Customer Chat} productName
+   */
+  categorySocial: '{productName} (Social)',
 };
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 const CATEGORY_UI_MAP = new Map([
   ['video', UIStrings.categoryVideo],
   ['customer-success', UIStrings.categoryCustomerSuccess],
+  ['marketing', UIStrings.categoryMarketing],
+  ['social', UIStrings.categorySocial],
 ]);
 
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
@@ -169,11 +181,12 @@ class ThirdPartyFacades extends Audit {
       const product = productSummary.product;
       const categoryTemplate = CATEGORY_UI_MAP.get(product.categories[0]);
 
-      // Display product name with category next to it in the same column
       let productWithCategory;
       if (categoryTemplate) {
+        // Display product name with category next to it in the same column
         productWithCategory = str_(categoryTemplate, {productName: product.name});
       } else {
+        // Just display product name if no category is found
         productWithCategory = product.name;
       }
 
