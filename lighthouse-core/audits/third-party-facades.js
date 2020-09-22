@@ -24,9 +24,9 @@ const ThirdPartySummary = require('./third-party-summary.js');
 
 const UIStrings = {
   /** Title of a diagnostic audit that provides details about the third-party code on a web page that can be lazy loaded with a facade alternative. This descriptive title is shown to users when no resources have facade alternatives available. Lazy loading means loading resources is deferred until they are needed. */
-  title: 'Lazy load third-party resources with facade alternatives',
+  title: 'Lazy load third-party resources with facades',
   /** Title of a diagnostic audit that provides details about the third-party code on a web page that can be lazy loaded with a facade alternative. This descriptive title is shown to users when one or more third-party resources have available facade alternatives. Lazy loading means loading resources is deferred until they are needed. */
-  failureTitle: 'Some third-party resources can be lazy loaded with a facade alternative',
+  failureTitle: 'Some third-party resources can be lazy loaded with a facade',
   /** Description of a Lighthouse audit that identifies the third party code on the page that can be lazy loaded with a facade alternative. This is displayed after a user expands the section to see more. No character length limits. 'Learn More' becomes link text to additional documentation. Lazy loading means loading resources is deferred until they are needed. */
   description: 'Some third party embeds can be lazy loaded. ' +
     'Consider replacing them with a facade until they are required. [Learn more](https://web.dev/efficiently-load-third-party-javascript/).',

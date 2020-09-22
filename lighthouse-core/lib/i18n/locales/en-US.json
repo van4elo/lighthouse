@@ -1335,10 +1335,10 @@
     "message": "{itemCount, plural,\n  =1 {# facade alternative available}\n  other {# facade alternatives available}\n  }"
   },
   "lighthouse-core/audits/third-party-facades.js | failureTitle": {
-    "message": "Some third-party resources can be lazy loaded with a facade alternative"
+    "message": "Some third-party resources can be lazy loaded with a facade"
   },
   "lighthouse-core/audits/third-party-facades.js | title": {
-    "message": "Lazy load third-party resources with facade alternatives"
+    "message": "Lazy load third-party resources with facades"
   },
   "lighthouse-core/audits/third-party-summary.js | columnThirdParty": {
     "message": "Third-Party"

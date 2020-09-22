@@ -1335,10 +1335,10 @@
     "message": "{itemCount, plural,\n  =1 {# f̂áĉád̂é âĺt̂ér̂ńât́îv́ê áv̂áîĺâb́l̂é}\n  other {# f̂áĉád̂é âĺt̂ér̂ńât́îv́êś âv́âíl̂áb̂ĺê}\n  }"
   },
   "lighthouse-core/audits/third-party-facades.js | failureTitle": {
-    "message": "Ŝóm̂é t̂h́îŕd̂-ṕâŕt̂ý r̂éŝóûŕĉéŝ ćâń b̂é l̂áẑý l̂óâd́êd́ ŵít̂h́ â f́âćâd́ê ál̂t́êŕn̂át̂ív̂é"
+    "message": "Ŝóm̂é t̂h́îŕd̂-ṕâŕt̂ý r̂éŝóûŕĉéŝ ćâń b̂é l̂áẑý l̂óâd́êd́ ŵít̂h́ â f́âćâd́ê"
   },
   "lighthouse-core/audits/third-party-facades.js | title": {
-    "message": "L̂áẑý l̂óâd́ t̂h́îŕd̂-ṕâŕt̂ý r̂éŝóûŕĉéŝ ẃît́ĥ f́âćâd́ê ál̂t́êŕn̂át̂ív̂éŝ"
+    "message": "L̂áẑý l̂óâd́ t̂h́îŕd̂-ṕâŕt̂ý r̂éŝóûŕĉéŝ ẃît́ĥ f́âćâd́êś"
   },
   "lighthouse-core/audits/third-party-summary.js | columnThirdParty": {
     "message": "T̂h́îŕd̂-Ṕâŕt̂ý"
