@@ -60,7 +60,7 @@ const PASS_THRESHOLD_IN_MS = 250;
  * @typedef {{
  *   transferSize: number,
  *   blockingTime: number,
- *   url: string,
+ *   url: string | LH.IcuMessage,
  * }} URLSummary
  */
 
