@@ -163,6 +163,8 @@ declare global {
         boundingRect: Rect | null,
         snippet: string,
         nodeLabel: string,
+        imageSource: string,
+        elementType: string,
       }
 
       export interface RuleExecutionError {

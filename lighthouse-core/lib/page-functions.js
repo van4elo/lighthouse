@@ -390,7 +390,6 @@ function getNodeLabel(node) {
 
 /**
  * @param {HTMLElement} element
- * @param {LH.Artifacts.Rect}
  */
 /* istanbul ignore next */
 function getBoundingClientRect(element) {
@@ -404,6 +403,23 @@ function getBoundingClientRect(element) {
     width: Math.round(rect.width),
     height: Math.round(rect.height),
   };
+}
+
+/**
+ * @param {HTMLElement} element
+ */
+/* instanbul ignore next */
+function getImageSource(element) {
+  const elementType = element.tagName.toLowerCase();
+  if (elementType === 'img') {
+    return element.getAttribute('src');
+  }
+
+  // If the element is not an <img>, it may have an image set via css
+  const style = window.getComputedStyle(element);
+  if (!style.backgroundImage) return '';
+
+  return style.backgroundImage.slice(4, -1).replace(/['"]/g, '');
 }
 
 /*
@@ -445,12 +461,15 @@ const getNodeDetailsString = `function getNodeDetails(elem) {
   ${getBoundingClientRect.toString()};
   ${getOuterHTMLSnippet.toString()};
   ${getNodeLabel.toString()};
+  ${getImageSource.toString()};
   return {
     devtoolsNodePath: getNodePath(elem),
     selector: getNodeSelector(elem),
     boundingRect: getBoundingClientRect(elem),
     snippet: getOuterHTMLSnippet(elem),
     nodeLabel: getNodeLabel(elem),
+    imageSource: getImageSource(elem),
+    elementType: elem.tagName.toLowerCase(),
   };
 }`;
 

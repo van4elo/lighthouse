@@ -16,6 +16,7 @@ const config = {
   audits: [
     'autocomplete',
     'full-page-screenshot',
+    'preload-lcp',
   ],
   passes: [{
     passName: 'defaultPass',
@@ -29,6 +30,12 @@ const config = {
     'best-practices': {
       auditRefs: [
         {id: 'autocomplete', weight: 0, group: 'best-practices-ux'},
+      ],
+    },
+    // @ts-ignore: same reason as above
+    'performance': {
+      auditRefs: [
+        {id: 'preload-lcp', weight: 0, group: 'load-opportunities'},
       ],
     },
   },
