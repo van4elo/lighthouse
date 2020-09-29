@@ -25,5 +25,5 @@ ViewportDimensions: {
 }
 
 
-content-width: pass undefined
+content-width: pass 
 
