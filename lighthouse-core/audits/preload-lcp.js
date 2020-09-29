@@ -17,7 +17,7 @@ const UIStrings = {
   /** Title of a lighthouse audit that tells a user to preload an image in order to improve their LCP time. */
   title: 'Preload Largest Contentful Paint image',
   /** Description of a lighthouse audit that tells a user to preload an image in order to improve their LCP time.  */
-  description: 'Consider preloading the image used by ' +
+  description: 'Preload the image used by ' +
     'the LCP element in order to improve your LCP time.',
 };
 
@@ -29,7 +29,7 @@ class PreloadLCPAudit extends Audit {
    */
   static get meta() {
     return {
-      id: 'preload-lcp',
+      id: 'preload-lcp-image',
       title: str_(UIStrings.title),
       description: str_(UIStrings.description),
       requiredArtifacts: ['traces', 'devtoolsLogs', 'URL', 'TraceElements'],
@@ -54,8 +54,8 @@ class PreloadLCPAudit extends Audit {
     if (request.isLinkPreload) return false;
     // It's not a request loaded over the network, don't recommend it.
     if (URL.NON_NETWORK_PROTOCOLS.includes(request.protocol)) return false;
-    // It's not at the right depth, don't recommend it.
-    if (initiatorPath.length < mainResourceDepth + 1) return false;
+    // It's already discoverable from the main document, don't recommend it.
+    if (initiatorPath.length <= mainResourceDepth) return false;
     // Finally, return whether or not it belongs to the main frame
     return request.frameId === mainResource.frameId;
   }
@@ -64,7 +64,7 @@ class PreloadLCPAudit extends Audit {
    * @param {LH.Artifacts.NetworkRequest} mainResource
    * @param {LH.Gatherer.Simulation.GraphNode} graph
    * @param {LH.Artifacts.TraceElement|undefined} lcpElement
-   * @return {string|null}
+   * @return {string|undefined}
    */
   static getURLToPreload(mainResource, graph, lcpElement) {
     if (!lcpElement) {
