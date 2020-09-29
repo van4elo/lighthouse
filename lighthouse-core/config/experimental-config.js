@@ -16,6 +16,7 @@ const config = {
   audits: [
     'autocomplete',
     'full-page-screenshot',
+    'large-javascript-libraries',
     'preload-lcp',
   ],
   passes: [{
@@ -27,15 +28,17 @@ const config = {
   categories: {
     // @ts-ignore: `title` is required in CategoryJson. setting to the same value as the default
     // config is awkward - easier to omit the property here. Will defer to default config.
+    'performance': {
+      auditRefs: [
+        {id: 'large-javascript-libraries', weight: 0, group: 'diagnostics'},
+        {id: 'preload-lcp', weight: 0, group: 'load-opportunities'},
+      ],
+    },
+    // @ts-ignore: `title` is required in CategoryJson. setting to the same value as the default
+    // config is awkward - easier to omit the property here. Will defer to default config.
     'best-practices': {
       auditRefs: [
         {id: 'autocomplete', weight: 0, group: 'best-practices-ux'},
-      ],
-    },
-    // @ts-ignore: same reason as above
-    'performance': {
-      auditRefs: [
-        {id: 'preload-lcp', weight: 0, group: 'load-opportunities'},
       ],
     },
   },
