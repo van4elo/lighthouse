@@ -74,6 +74,8 @@ const CATEGORY_UI_MAP = new Map([
 /** @typedef {{
  *  product: ThirdPartyProduct,
  *  startOfProductRequests: number,
+ *  transferSize: number,
+ *  blockingTime: number,
  *  urlSummaries: Map<string, ThirdPartySummary.Summary>
  * }} FacadableProductSummary
  */
@@ -114,11 +116,15 @@ class ThirdPartyFacades extends Audit {
       /** @type {FacadableProductSummary} */
       const productSummary = productSummaries.get(product.name) || {
         product,
+        transferSize: 0,
+        blockingTime: 0,
         startOfProductRequests: Infinity,
         urlSummaries: new Map(),
       };
 
       productSummary.urlSummaries.set(url, urlSummary);
+      productSummary.transferSize += urlSummary.transferSize;
+      productSummary.blockingTime += urlSummary.blockingTime;
 
       // This is the time the product resource is fetched.
       // Any resources of the same entity fetched after this point are considered as part of this product.
@@ -145,6 +151,8 @@ class ThirdPartyFacades extends Audit {
       for (const productSummary of productSummaries.values()) {
         if (urlSummary.firstStartTime < productSummary.startOfProductRequests) continue;
         productSummary.urlSummaries.set(url, urlSummary);
+        productSummary.transferSize += urlSummary.transferSize;
+        productSummary.blockingTime += urlSummary.blockingTime;
       }
 
       entitySummaries.set(entity.name, productSummaries);
@@ -193,21 +201,15 @@ class ThirdPartyFacades extends Audit {
         productWithCategory = product.name;
       }
 
-      const items = [];
-      let transferSize = 0;
-      let blockingTime = 0;
-      for (const [url, urlStats] of productSummary.urlSummaries) {
-        items.push({url, ...urlStats});
-        transferSize += urlStats.transferSize;
-        blockingTime += urlStats.blockingTime;
-      }
-      items.sort((a, b) => {
-        return b.transferSize - a.transferSize;
-      });
+      const items = Array.from(productSummary.urlSummaries)
+        .map(([url, urlStats]) => {
+          return {url, ...urlStats};
+        })
+        .sort((a, b) => b.transferSize - a.transferSize);
       results.push({
         product: productWithCategory,
-        transferSize,
-        blockingTime,
+        transferSize: productSummary.transferSize,
+        blockingTime: productSummary.blockingTime,
         subItems: {type: 'subitems', items},
       });
     }
