@@ -35,25 +35,25 @@ const UIStrings = {
   =1 {# facade alternative available}
   other {# facade alternatives available}
   }`,
-  /** Label for a table column that displays the name of the third party product that a URL is used for. */
+  /** Label for a table column that displays the name of the product that a URL is used for. A product is a piece of software used on the page. */
   columnProduct: 'Product',
   /**
-   * @description Template for an entry in the "Product" column for a third party product which is in the video category.
+   * @description Template for a table entry that gives the name of a product which we categorize as video related.
    * @example {YouTube Embedded Player} productName
    */
   categoryVideo: '{productName} (Video)',
   /**
-   * @description Template for an entry in the "Product" column for a third party product which is in the customer success category.
+   * @description Template for a table entry that gives the name of a product which we categorize as customer success related. Customer success means the product supports customers by offering chat and contact solutions.
    * @example {Intercom Widget} productName
    */
   categoryCustomerSuccess: '{productName} (Customer Success)',
   /**
-   * @description Template for an entry in the "Product" column for a third party product which is in the marketing category.
+   * @description Template for a table entry that gives the name of a product which we categorize as marketing related.
    * @example {Drift Live Chat} productName
    */
   categoryMarketing: '{productName} (Marketing)',
   /**
-   * @description Template for an entry in the "Product" column for a third party product which is in the social category.
+   * @description Template for a table entry that gives the name of a product which we categorize as social related.
    * @example {Facebook Messenger Customer Chat} productName
    */
   categorySocial: '{productName} (Social)',
@@ -101,47 +101,51 @@ class ThirdPartyFacades extends Audit {
     /** @type {Map<string, Map<string, FacadableProductSummary>>} */
     const entitySummaries = new Map();
 
+    // The first pass finds all requests to products that have a facade.
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
-      const productSummaries = entitySummaries.get(entity.name) || new Map();
       const product = thirdPartyWeb.getProduct(url);
-      if (product && product.facades && product.facades.length) {
-        // Record new url if product has a facade.
+      if (!product || !product.facades || !product.facades.length) continue;
 
-        /** @type {FacadableProductSummary} */
-        const productSummary = productSummaries.get(product.name) || {
-          product,
-          cutoffTime: Infinity,
-          urlSummaries: new Map(),
-        };
+      /** @type {Map<string, FacadableProductSummary>} */
+      const productSummaries = entitySummaries.get(entity.name) || new Map();
+      /** @type {FacadableProductSummary} */
+      const productSummary = productSummaries.get(product.name) || {
+        product,
+        cutoffTime: Infinity,
+        urlSummaries: new Map(),
+      };
 
-        productSummary.urlSummaries.set(url, urlSummary);
+      productSummary.urlSummaries.set(url, urlSummary);
 
-        // This is the time the product resource is fetched.
-        // Any resources of the same entity fetched after this point are considered as part of this product.
-        productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.firstEndTime);
+      // This is the time the product resource is fetched.
+      // Any resources of the same entity fetched after this point are considered as part of this product.
+      productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.firstEndTime);
 
-        productSummaries.set(product.name, productSummary);
-      }
+      productSummaries.set(product.name, productSummary);
       entitySummaries.set(entity.name, productSummaries);
     }
 
+    // The second pass finds all other resources belonging to one of the products found above.
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
-      const productSummaries = entitySummaries.get(entity.name) || new Map();
       const product = thirdPartyWeb.getProduct(url);
-      if (!product || !product.facades || !product.facades.length) {
-        // If the url does not have a facade but one or more products on its entity do,
-        // we still want to record this url because it was probably fetched by a product with a facade.
-        for (const productSummary of productSummaries.values()) {
-          if (urlSummary.firstStartTime < productSummary.cutoffTime) continue;
-          productSummary.urlSummaries.set(url, urlSummary);
-        }
+      if (product && product.facades && product.facades.length) continue;
+
+      const productSummaries = entitySummaries.get(entity.name);
+      if (!productSummaries) continue;
+
+      // If the url does not have a facade but one or more products on its entity do,
+      // we still want to record this url because it was probably fetched by a product with a facade.
+      for (const productSummary of productSummaries.values()) {
+        if (urlSummary.firstStartTime < productSummary.cutoffTime) continue;
+        productSummary.urlSummaries.set(url, urlSummary);
       }
+
       entitySummaries.set(entity.name, productSummaries);
     }
 
@@ -173,8 +177,6 @@ class ThirdPartyFacades extends Audit {
     const productSummaries
       = ThirdPartyFacades.getFacadableProductSummaries(thirdPartySummaries.byURL, mainEntity);
 
-    const summary = {wastedBytes: 0, wastedMs: 0};
-
     /** @type {LH.Audit.Details.TableItem[]} */
     const results = [];
     for (const productSummary of productSummaries) {
@@ -201,8 +203,6 @@ class ThirdPartyFacades extends Audit {
       items.sort((a, b) => {
         return b.transferSize - a.transferSize;
       });
-      summary.wastedBytes += transferSize;
-      summary.wastedMs += blockingTime;
       results.push({
         product: productWithCategory,
         transferSize,
@@ -232,7 +232,7 @@ class ThirdPartyFacades extends Audit {
       displayValue: str_(UIStrings.displayValue, {
         itemCount: results.length,
       }),
-      details: Audit.makeTableDetails(headings, results, summary),
+      details: Audit.makeTableDetails(headings, results),
     };
   }
 }

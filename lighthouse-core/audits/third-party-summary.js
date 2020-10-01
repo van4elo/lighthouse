@@ -39,36 +39,32 @@ const PASS_THRESHOLD_IN_MS = 250;
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 
 /**
- * @typedef {{
- *   mainThreadTime: number,
- *   transferSize: number,
- *   blockingTime: number,
- *   firstStartTime: number,
- *   firstEndTime: number,
- * }} Summary
+ * @typedef Summary
+ * @property {number} mainThreadTime
+ * @property {number} transferSize
+ * @property {number} blockingTime
+ * @property {number} firstStartTime Start time of the first network request.
+ * @property {number} firstEndTime End time of the first network request.
  */
 
 /**
- * @typedef {{
- *   mainThreadTime: number,
- *   transferSize: number,
- *   blockingTime: number,
- * }} EntitySummary
+ * @typedef EntitySummary
+ * @property {number} mainThreadTime
+ * @property {number} transferSize
+ * @property {number} blockingTime
  */
 
 /**
- * @typedef {{
- *   transferSize: number,
- *   blockingTime: number,
- *   url: string | LH.IcuMessage,
- * }} URLSummary
+ * @typedef URLSummary
+ * @property {number} transferSize
+ * @property {number} blockingTime
+ * @property {string | LH.IcuMessage} url
  */
 
-/** @typedef {{
- *  byEntity: Map<ThirdPartyEntity, EntitySummary>,
- *  byURL: Map<string, Summary>,
- *  urls: Map<ThirdPartyEntity, string[]>
- * }} SummaryMap
+/** @typedef SummaryMaps
+ * @property {Map<ThirdPartyEntity, EntitySummary>} byEntity Map of impact summaries for each entity.
+ * @property {Map<string, Summary>} byURL Map of impact summaries for each URL.
+ * @property {Map<ThirdPartyEntity, string[]>} urls Map of URLs under each entity.
  */
 
 /**
@@ -99,7 +95,7 @@ class ThirdPartySummary extends Audit {
    * @param {Array<LH.Artifacts.NetworkRequest>} networkRecords
    * @param {Array<LH.Artifacts.TaskNode>} mainThreadTasks
    * @param {number} cpuMultiplier
-   * @return {SummaryMap}
+   * @return {SummaryMaps}
    */
   static getSummaries(networkRecords, mainThreadTasks, cpuMultiplier) {
     /** @type {Map<string, Summary>} */
@@ -166,7 +162,7 @@ class ThirdPartySummary extends Audit {
 
   /**
    * @param {ThirdPartyEntity} entity
-   * @param {SummaryMap} summaries
+   * @param {SummaryMaps} summaries
    * @param {EntitySummary} stats
    * @return {Array<URLSummary>}
    */
