@@ -180,7 +180,7 @@ describe('Third party facades audit', () => {
       devtoolsLogs: {
         defaultPass: networkRecordsToDevtoolsLog([
           resourceEntry(100, 101, 102, 2000, 'https://example.com'),
-          // The first product entry is used for the cutoff time
+          // The first product entry is used to mark the start of product requests
           intercomProductEntry(200, 201, 202, 2000, '1'),
           intercomResourceEntry(300, 301, 302, 8000, 'a'),
           intercomProductEntry(400, 401, 402, 2000, '1'),
@@ -226,7 +226,7 @@ describe('Third party facades audit', () => {
     ]);
   });
 
-  it('uses receiveHeadersEnd as cutoff', async () => {
+  it('uses receiveHeadersEnd to mark start of product requests', async () => {
     const artifacts = {
       devtoolsLogs: {
         defaultPass: networkRecordsToDevtoolsLog([

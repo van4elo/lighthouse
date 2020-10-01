@@ -73,7 +73,7 @@ const CATEGORY_UI_MAP = new Map([
 
 /** @typedef {{
  *  product: ThirdPartyProduct,
- *  cutoffTime: number,
+ *  startOfProductRequests: number,
  *  urlSummaries: Map<string, ThirdPartySummary.Summary>
  * }} FacadableProductSummary
  */
@@ -114,7 +114,7 @@ class ThirdPartyFacades extends Audit {
       /** @type {FacadableProductSummary} */
       const productSummary = productSummaries.get(product.name) || {
         product,
-        cutoffTime: Infinity,
+        startOfProductRequests: Infinity,
         urlSummaries: new Map(),
       };
 
@@ -122,7 +122,8 @@ class ThirdPartyFacades extends Audit {
 
       // This is the time the product resource is fetched.
       // Any resources of the same entity fetched after this point are considered as part of this product.
-      productSummary.cutoffTime = Math.min(productSummary.cutoffTime, urlSummary.firstEndTime);
+      productSummary.startOfProductRequests
+        = Math.min(productSummary.startOfProductRequests, urlSummary.firstEndTime);
 
       productSummaries.set(product.name, productSummary);
       entitySummaries.set(entity.name, productSummaries);
@@ -142,7 +143,7 @@ class ThirdPartyFacades extends Audit {
       // If the url does not have a facade but one or more products on its entity do,
       // we still want to record this url because it was probably fetched by a product with a facade.
       for (const productSummary of productSummaries.values()) {
-        if (urlSummary.firstStartTime < productSummary.cutoffTime) continue;
+        if (urlSummary.firstStartTime < productSummary.startOfProductRequests) continue;
         productSummary.urlSummaries.set(url, urlSummary);
       }
 
