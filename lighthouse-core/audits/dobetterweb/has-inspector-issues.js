@@ -12,7 +12,7 @@
 
 'use strict';
 
-/** @typedef {{issueType: string, description: string, requestUrl?: string}} IssueItem */
+/** @typedef {{issueType: string, description: LH.IcuMessage, requestUrl?: string}} IssueItem */
 
 const Audit = require('../audit.js');
 const i18n = require('../../lib/i18n/i18n.js');
@@ -64,19 +64,19 @@ const UIStrings = {
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 
-/** @type {Record<string, string>} */
+/** @type {Record<string, LH.IcuMessage>} */
 const heavyAdsMsgMap = {
   'NetworkTotalLimit': str_(UIStrings.heavyAdsNetworkLimitMessage),
   'CpuTotalLimit': str_(UIStrings.heavyAdsCPUTotalLimitMessage),
   'CpuPeakLimit': str_(UIStrings.heavyAdsCPUPeakLimitMessage),
 };
-/** @type {Object<string, string>} */
+/** @type {Record<string, LH.IcuMessage>} */
 const contentSecurityPolicyMsgMap = {
   'kInlineViolation': str_(UIStrings.cspInlineViolationMessage),
   'kEvalViolation': str_(UIStrings.cspEvalViolationMessage),
   'kURLViolation': str_(UIStrings.cspUrlViolationMessage),
 };
-/** @type {Object<string, string>} */
+/** @type {Record<string, LH.IcuMessage>} */
 const blockedByResponseMsgMap = {
   'CoepFrameResourceNeedsCoepHeader': str_(UIStrings.coepResourceBlockedMessage),
   'CoopSandboxedIFrameCannotNavigateToCoopPage': str_(UIStrings.coopIframeBlockedMessage),
