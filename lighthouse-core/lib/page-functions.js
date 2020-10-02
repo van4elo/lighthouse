@@ -405,23 +405,6 @@ function getBoundingClientRect(element) {
   };
 }
 
-/**
- * @param {HTMLElement} element
- */
-/* instanbul ignore next */
-function getImageSource(element) {
-  const elementType = element.tagName.toLowerCase();
-  if (elementType === 'img') {
-    return element.getAttribute('src');
-  }
-
-  // If the element is not an <img>, it may have an image set via css
-  const style = window.getComputedStyle(element);
-  if (!style.backgroundImage) return '';
-
-  return style.backgroundImage.slice(4, -1).replace(/['"]/g, '');
-}
-
 /*
  * RequestIdleCallback shim that calculates the remaining deadline time in order to avoid a potential lighthouse
  * penalty for tests run with simulated throttling. Reduces the deadline time to (50 - safetyAllowance) / cpuSlowdownMultiplier to
@@ -461,14 +444,12 @@ const getNodeDetailsString = `function getNodeDetails(elem) {
   ${getBoundingClientRect.toString()};
   ${getOuterHTMLSnippet.toString()};
   ${getNodeLabel.toString()};
-  ${getImageSource.toString()};
   return {
     devtoolsNodePath: getNodePath(elem),
     selector: getNodeSelector(elem),
     boundingRect: getBoundingClientRect(elem),
     snippet: getOuterHTMLSnippet(elem),
     nodeLabel: getNodeLabel(elem),
-    imageSource: getImageSource(elem),
     elementType: elem.tagName.toLowerCase(),
   };
 }`;

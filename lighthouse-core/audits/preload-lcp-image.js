@@ -23,7 +23,7 @@ const UIStrings = {
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
 
-class PreloadLCPAudit extends Audit {
+class PreloadLCPImageAudit extends Audit {
   /**
    * @return {LH.Audit.Meta}
    */
@@ -32,7 +32,7 @@ class PreloadLCPAudit extends Audit {
       id: 'preload-lcp-image',
       title: str_(UIStrings.title),
       description: str_(UIStrings.description),
-      requiredArtifacts: ['traces', 'devtoolsLogs', 'URL', 'TraceElements'],
+      requiredArtifacts: ['traces', 'devtoolsLogs', 'URL', 'TraceElements', 'ImageElements'],
       scoreDisplayMode: Audit.SCORING_MODES.NUMERIC,
     };
   }
@@ -42,7 +42,7 @@ class PreloadLCPAudit extends Audit {
    * @param {LH.Artifacts.NetworkRequest} request
    * @param {LH.Artifacts.NetworkRequest} mainResource
    * @param {Array<LH.Gatherer.Simulation.GraphNode>} initiatorPath
-   * @param {string|undefined} lcpImageSource
+   * @param {string} lcpImageSource
    * @return {boolean}
    */
   static shouldPreloadRequest(request, mainResource, initiatorPath, lcpImageSource) {
@@ -64,21 +64,26 @@ class PreloadLCPAudit extends Audit {
    * @param {LH.Artifacts.NetworkRequest} mainResource
    * @param {LH.Gatherer.Simulation.GraphNode} graph
    * @param {LH.Artifacts.TraceElement|undefined} lcpElement
+   * @param {Array<LH.Artifacts.ImageElement>} imageElements
    * @return {string|undefined}
    */
-  static getURLToPreload(mainResource, graph, lcpElement) {
-    if (!lcpElement) {
-      return null;
-    }
+  static getURLToPreload(mainResource, graph, lcpElement, imageElements) {
+    if (!lcpElement) return undefined;
 
-    let lcpUrl = null;
+    const lcpImageElement = imageElements.find(elem => {
+      return elem.devtoolsNodePath === lcpElement.devtoolsNodePath;
+    });
+
+    if (!lcpImageElement) return undefined;
+
+    let lcpUrl;
     graph.traverse((node, traversalPath) => {
       if (node.type !== 'network') return;
       const record = node.record;
-      const imageSource = lcpElement.imageSource;
+      const imageSource = lcpImageElement.src;
       // Don't include the node itself or any CPU nodes in the initiatorPath
       const path = traversalPath.slice(1).filter(initiator => initiator.type === 'network');
-      if (!PreloadLCPAudit.shouldPreloadRequest(record, mainResource, path, imageSource)) return;
+      if (!PreloadLCPImageAudit.shouldPreloadRequest(record, mainResource, path, imageSource)) return;
       lcpUrl = node.record.url;
     });
 
@@ -136,8 +141,8 @@ class PreloadLCPAudit extends Audit {
    * @return {Promise<LH.Audit.Product>}
    */
   static async audit(artifacts, context) {
-    const trace = artifacts.traces[PreloadLCPAudit.DEFAULT_PASS];
-    const devtoolsLog = artifacts.devtoolsLogs[PreloadLCPAudit.DEFAULT_PASS];
+    const trace = artifacts.traces[PreloadLCPImageAudit.DEFAULT_PASS];
+    const devtoolsLog = artifacts.devtoolsLogs[PreloadLCPImageAudit.DEFAULT_PASS];
     const URL = artifacts.URL;
     const simulatorOptions = {trace, devtoolsLog, settings: context.settings};
     const lcpElement = artifacts.TraceElements
@@ -149,12 +154,12 @@ class PreloadLCPAudit extends Audit {
 
     const [mainResource, lanternLCP, simulator] = await Promise.all([
       MainResource.request({devtoolsLog, URL}, context),
-      LanternLCP.request({trace, devtoolsLog, settings}, context),
+      LanternLCP.request(simulatorOptions, context),
       LoadSimulator.request(simulatorOptions, context),
     ]);
 
     const graph = lanternLCP.pessimisticGraph;
-    const lcpUrl = PreloadLCPAudit.getURLToPreload(mainResource, graph, lcpElement);
+    const lcpUrl = PreloadLCPImageAudit.getURLToPreload(mainResource, graph, lcpElement, artifacts.ImageElements);
     if (!lcpUrl) {
       return {
         score: 1,
@@ -162,7 +167,7 @@ class PreloadLCPAudit extends Audit {
       };
     }
 
-    const {results, wastedMs} = PreloadLCPAudit.computeWasteWithGraph(lcpUrl, graph, simulator);
+    const {results, wastedMs} = PreloadLCPImageAudit.computeWasteWithGraph(lcpUrl, graph, simulator);
 
     /** @type {LH.Audit.Details.Opportunity['headings']} */
     const headings = [
@@ -181,5 +186,5 @@ class PreloadLCPAudit extends Audit {
   }
 }
 
-module.exports = PreloadLCPAudit;
+module.exports = PreloadLCPImageAudit;
 module.exports.UIStrings = UIStrings;
