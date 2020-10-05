@@ -12,16 +12,12 @@ const InspectorIssuesAudit =
 
 describe('Has inspector issues audit', () => {
   it('passes when no issues are found', () => {
+    /** @type {LH.Artifacts.InspectorIssues} */
     const issues = {
-      /** @type {Array<LH.Crdp.Audits.MixedContentIssueDetails>} */
       mixedContent: [],
-      /** @type {Array<LH.Crdp.Audits.SameSiteCookieIssueDetails>} */
       sameSiteCookies: [],
-      /** @type {Array<LH.Crdp.Audits.BlockedByResponseIssueDetails>} */
       blockedByResponse: [],
-      /** @type {Array<LH.Crdp.Audits.HeavyAdIssueDetails>} */
       heavyAds: [],
-      /** @type {Array<LH.Crdp.Audits.ContentSecurityPolicyIssueDetails>} */
       contentSecurityPolicy: [],
     };
     const auditResult = InspectorIssuesAudit.audit({

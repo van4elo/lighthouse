@@ -104,16 +104,12 @@ class IssuesPanelEntries extends Audit {
    * @return {Array<IssueItem>}
    */
   static getMixedContentItems(mixedContentIssues) {
-    if (!mixedContentIssues) {
-      return [];
-    }
-
     return mixedContentIssues.map(issue => {
       const requestUrl = issue.request && issue.request.url;
       return {
         issueType: 'MixedContent',
         description: str_(UIStrings.mixedContentMessage),
-        requestUrl: issue.mainResourceURL || requestUrl,
+        requestUrl: requestUrl || issue.mainResourceURL,
       };
     });
   }
@@ -123,16 +119,12 @@ class IssuesPanelEntries extends Audit {
    * @return {Array<IssueItem>}
    */
   static getSameSiteCookieItems(sameSiteCookieIssues) {
-    if (!sameSiteCookieIssues) {
-      return [];
-    }
-
     return sameSiteCookieIssues.map(issue => {
       const requestUrl = issue.request && issue.request.url;
       return {
         issueType: 'SameSiteCookie',
         description: str_(UIStrings.sameSiteMessage),
-        requestUrl: issue.cookieUrl || requestUrl,
+        requestUrl: requestUrl || issue.cookieUrl,
       };
     });
   }
@@ -142,10 +134,6 @@ class IssuesPanelEntries extends Audit {
    * @return {Array<IssueItem>}
    */
   static getBlockedByResponseItems(blockedByResponseIssues) {
-    if (!blockedByResponseIssues) {
-      return [];
-    }
-
     return blockedByResponseIssues.map(issue => {
       const blockedReason = issue.reason;
       return {
@@ -161,10 +149,6 @@ class IssuesPanelEntries extends Audit {
    * @return {Array<IssueItem>}
    */
   static getHeavyAdsItems(heavyAdsIssues) {
-    if (!heavyAdsIssues) {
-      return [];
-    }
-
     return heavyAdsIssues.map(issue => {
       const reason = issue.reason;
       return {
@@ -179,10 +163,6 @@ class IssuesPanelEntries extends Audit {
    * @return {Array<IssueItem>}
    */
   static getContentSecurityPolicyItems(cspIssues) {
-    if (!cspIssues) {
-      return [];
-    }
-
     return cspIssues
     .filter(issue => {
       // kTrustedTypesSinkViolation and kTrustedTypesPolicyViolation aren't currently supported by the Issues panel
@@ -212,28 +192,13 @@ class IssuesPanelEntries extends Audit {
     ];
 
     const issues = artifacts.InspectorIssues;
-    /** @type {Array<IssueItem>} */
-    const items = [];
-
-    for (const [issueType, issuesOfType] of Object.entries(issues)) {
-      switch (issueType) {
-        case 'sameSiteCookies':
-          items.push(...this.getSameSiteCookieItems(issuesOfType));
-          break;
-        case 'mixedContent':
-          items.push(...this.getMixedContentItems(issuesOfType));
-          break;
-        case 'blockedByResponse':
-          items.push(...this.getBlockedByResponseItems(issuesOfType));
-          break;
-        case 'heavyAds':
-          items.push(...this.getHeavyAdsItems(issuesOfType));
-          break;
-        case 'contentSecurityPolicy':
-          items.push(...this.getContentSecurityPolicyItems(issuesOfType));
-          break;
-      }
-    }
+    const items = [
+      ...this.getSameSiteCookieItems(issues.sameSiteCookies),
+      ...this.getMixedContentItems(issues.mixedContent),
+      ...this.getBlockedByResponseItems(issues.blockedByResponse),
+      ...this.getHeavyAdsItems(issues.heavyAds),
+      ...this.getContentSecurityPolicyItems(issues.contentSecurityPolicy),
+    ];
 
     return {
       score: items.length > 0 ? 0 : 1,
