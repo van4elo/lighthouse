@@ -171,7 +171,7 @@ class ThirdPartyFacades extends Audit {
         // This is the time the product resource is fetched.
         // Any resources of the same entity fetched after this point are considered as part of this product.
         productSummary.startOfProductRequests
-          = Math.min(productSummary.startOfProductRequests, urlSummary.firstEndTime);
+          = Math.min(productSummary.startOfProductRequests, urlSummary.firstContentAvailable);
 
         productSummaries.set(productName, productSummary);
       }

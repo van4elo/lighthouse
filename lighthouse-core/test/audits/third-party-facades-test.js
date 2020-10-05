@@ -82,7 +82,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 8000,
               firstStartTime: 300,
-              firstEndTime: 301,
+              firstContentAvailable: 301,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
@@ -90,7 +90,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 4000,
               firstStartTime: 200,
-              firstEndTime: 201,
+              firstContentAvailable: 201,
             },
           ],
         },
@@ -134,7 +134,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 8000,
               firstStartTime: 300,
-              firstEndTime: 301,
+              firstContentAvailable: 301,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
@@ -142,7 +142,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 4000,
               firstStartTime: 200,
-              firstEndTime: 201,
+              firstContentAvailable: 201,
             },
           ],
         },
@@ -159,7 +159,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 7000,
               firstStartTime: 310,
-              firstEndTime: 311,
+              firstContentAvailable: 311,
             },
             {
               url: 'https://www.youtube.com/embed/2',
@@ -167,7 +167,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 3000,
               firstStartTime: 210,
-              firstEndTime: 211,
+              firstContentAvailable: 211,
             },
           ],
         },
@@ -210,7 +210,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 8000,
               firstStartTime: 300,
-              firstEndTime: 301,
+              firstContentAvailable: 301,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
@@ -218,7 +218,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 4000,
               firstStartTime: 200,
-              firstEndTime: 201,
+              firstContentAvailable: 201,
             },
           ],
         },
@@ -264,7 +264,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 8000,
               firstStartTime: 206,
-              firstEndTime: 208,
+              firstContentAvailable: 208,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
@@ -272,7 +272,7 @@ describe('Third party facades audit', () => {
               blockingTime: 0,
               transferSize: 4000,
               firstStartTime: 200,
-              firstEndTime: 205,
+              firstContentAvailable: 205,
             },
           ],
         },
@@ -361,7 +361,7 @@ describe('Third party facades audit', () => {
             items: [
               {
                 blockingTime: 0,
-                firstEndTime: 47786.347774999995,
+                firstContentAvailable: 47786.347774999995,
                 firstStartTime: 47786.326268,
                 mainThreadTime: 0,
                 transferSize: 459603,
@@ -369,7 +369,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.692717,
+                firstContentAvailable: 47786.692717,
                 firstStartTime: 47786.569798,
                 mainThreadTime: 0,
                 transferSize: 66273,
@@ -377,7 +377,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.436251,
+                firstContentAvailable: 47786.436251,
                 firstStartTime: 47786.325979,
                 mainThreadTime: 0,
                 transferSize: 50213,
@@ -385,7 +385,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.441221,
+                firstContentAvailable: 47786.441221,
                 firstStartTime: 47786.324095,
                 mainThreadTime: 0,
                 transferSize: 46813,
@@ -393,7 +393,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.580910000004,
+                firstContentAvailable: 47786.580910000004,
                 firstStartTime: 47786.561199,
                 mainThreadTime: 0,
                 transferSize: 11477,
@@ -401,7 +401,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.303873000004,
+                firstContentAvailable: 47786.303873000004,
                 firstStartTime: 47786.066226,
                 mainThreadTime: 0,
                 transferSize: 10703,
@@ -409,7 +409,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.414732000005,
+                firstContentAvailable: 47786.414732000005,
                 firstStartTime: 47786.326585,
                 mainThreadTime: 0,
                 transferSize: 3191,
@@ -417,7 +417,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.679700999994,
+                firstContentAvailable: 47786.679700999994,
                 firstStartTime: 47786.568895,
                 mainThreadTime: 0,
                 transferSize: 3077,
@@ -434,7 +434,7 @@ describe('Third party facades audit', () => {
             items: [
               {
                 blockingTime: 0,
-                firstEndTime: 47786.422034999996,
+                firstContentAvailable: 47786.422034999996,
                 firstStartTime: 47786.323843,
                 mainThreadTime: 0,
                 transferSize: 145772,
@@ -442,7 +442,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.422311999995,
+                firstContentAvailable: 47786.422311999995,
                 firstStartTime: 47786.324528,
                 mainThreadTime: 0,
                 transferSize: 17633,
@@ -450,7 +450,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.634061000004,
+                firstContentAvailable: 47786.634061000004,
                 firstStartTime: 47786.606134,
                 mainThreadTime: 0,
                 transferSize: 9313,
@@ -458,7 +458,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.291588,
+                firstContentAvailable: 47786.291588,
                 firstStartTime: 47786.074447,
                 mainThreadTime: 0,
                 transferSize: 8300,
@@ -466,7 +466,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.47053,
+                firstContentAvailable: 47786.47053,
                 firstStartTime: 47786.325692,
                 mainThreadTime: 0,
                 transferSize: 1474,
@@ -474,7 +474,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.417184000005,
+                firstContentAvailable: 47786.417184000005,
                 firstStartTime: 47786.32147,
                 mainThreadTime: 0,
                 transferSize: 1075,
@@ -482,7 +482,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47787.641538,
+                firstContentAvailable: 47787.641538,
                 firstStartTime: 47786.499527,
                 mainThreadTime: 0,
                 transferSize: 818,
@@ -490,7 +490,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.70353599999,
+                firstContentAvailable: 47786.70353599999,
                 firstStartTime: 47786.608785,
                 mainThreadTime: 0,
                 transferSize: 110,
@@ -498,7 +498,7 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstEndTime: 47786.06986,
+                firstContentAvailable: 47786.06986,
                 firstStartTime: 47786.069794,
                 mainThreadTime: 0,
                 transferSize: 0,

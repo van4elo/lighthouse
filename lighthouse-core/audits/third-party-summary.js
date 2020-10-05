@@ -44,7 +44,7 @@ const PASS_THRESHOLD_IN_MS = 250;
  * @property {number} transferSize
  * @property {number} blockingTime
  * @property {number} firstStartTime Start time of the first network request.
- * @property {number} firstEndTime End time of the first network request.
+ * @property {number} firstContentAvailable First time when content is available. If that time is unavailable, use end time.
  */
 
 /**
@@ -106,15 +106,16 @@ class ThirdPartySummary extends Audit {
 
     for (const request of networkRecords) {
       const urlSummary = byURL.get(request.url) ||
-        {...defaultSummary, firstStartTime: Infinity, firstEndTime: Infinity};
+        {...defaultSummary, firstStartTime: Infinity, firstContentAvailable: Infinity};
       urlSummary.transferSize += request.transferSize;
       urlSummary.firstStartTime = Math.min(urlSummary.firstStartTime, request.startTime);
       if (request.timing) {
-        // Lookahead preparser may start requests before entire HTML is loaded
         const receiveHeadersEndTime = request.startTime + request.timing.receiveHeadersEnd / 1000;
-        urlSummary.firstEndTime = Math.min(urlSummary.firstEndTime, receiveHeadersEndTime);
+        urlSummary.firstContentAvailable
+          = Math.min(urlSummary.firstContentAvailable, receiveHeadersEndTime);
       } else {
-        urlSummary.firstEndTime = Math.min(urlSummary.firstEndTime, request.endTime);
+        urlSummary.firstContentAvailable
+          = Math.min(urlSummary.firstContentAvailable, request.endTime);
       }
       byURL.set(request.url, urlSummary);
     }
@@ -125,7 +126,7 @@ class ThirdPartySummary extends Audit {
       const attributableURL = BootupTime.getAttributableURLForTask(task, jsURLs);
 
       const urlSummary = byURL.get(attributableURL) ||
-        {...defaultSummary, firstStartTime: Infinity, firstEndTime: Infinity};
+        {...defaultSummary, firstStartTime: Infinity, firstContentAvailable: Infinity};
       const taskDuration = task.selfTime * cpuMultiplier;
       // The amount of time spent on main thread is the sum of all durations.
       urlSummary.mainThreadTime += taskDuration;
