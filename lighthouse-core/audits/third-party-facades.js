@@ -60,12 +60,24 @@ const UIStrings = {
 };
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
-const CATEGORY_UI_MAP = new Map([
-  ['video', UIStrings.categoryVideo],
-  ['customer-success', UIStrings.categoryCustomerSuccess],
-  ['marketing', UIStrings.categoryMarketing],
-  ['social', UIStrings.categorySocial],
-]);
+
+/** @type {Record<string, string>} */
+const CATEGORY_UI_MAP = {
+  'video': UIStrings.categoryVideo,
+  'customer-success': UIStrings.categoryCustomerSuccess,
+  'marketing': UIStrings.categoryMarketing,
+  'social': UIStrings.categorySocial,
+};
+
+/** @type {Record<string, RegExp>} */
+const DEFERRABLE_PRODUCT_FIRST_RESOURCE = {
+  'Facebook Messenger Customer Chat': /connect\.facebook.net\/.*\/sdk\/xfbml\.customerchat\.js/,
+  'YouTube Embedded Player': /youtube\.com\/embed\//,
+  'Help Scout Beacon': /beacon-v2\.helpscout\.net/,
+  'Vimeo Embedded Player': /player\.vimeo\.com\/video\//,
+  'Drift Live Chat': /js\.driftt\.com\/include\/.*\/.*\.js/,
+  'Intercom Widget': /widget\.intercom\.io\/widget\/.*/,
+};
 
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 /** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
@@ -95,6 +107,18 @@ class ThirdPartyFacades extends Audit {
   }
 
   /**
+   * @param {string} url
+   * @return {string[]}
+   */
+  static firstResourceProductNames(url) {
+    const productNames = [];
+    for (const [name, regex] of Object.entries(DEFERRABLE_PRODUCT_FIRST_RESOURCE)) {
+      if (regex.test(url)) productNames.push(name);
+    }
+    return productNames;
+  }
+
+  /**
    * @param {Map<string, ThirdPartySummary.Summary>} byURL
    * @param {ThirdPartyEntity | undefined} mainEntity
    * @return {FacadableProductSummary[]}
@@ -104,7 +128,7 @@ class ThirdPartyFacades extends Audit {
     const entitySummaries = new Map();
 
     // The first pass finds all requests to products that have a facade.
-    for (const [url, urlSummary] of byURL) {
+    for (const url of byURL.keys()) {
       const entity = thirdPartyWeb.getEntity(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
@@ -113,35 +137,54 @@ class ThirdPartyFacades extends Audit {
 
       /** @type {Map<string, FacadableProductSummary>} */
       const productSummaries = entitySummaries.get(entity.name) || new Map();
-      /** @type {FacadableProductSummary} */
-      const productSummary = productSummaries.get(product.name) || {
+      if (productSummaries.has(product.name)) continue;
+
+      productSummaries.set(product.name, {
         product,
         transferSize: 0,
         blockingTime: 0,
         startOfProductRequests: Infinity,
         urlSummaries: new Map(),
-      };
-
-      productSummary.urlSummaries.set(url, urlSummary);
-      productSummary.transferSize += urlSummary.transferSize;
-      productSummary.blockingTime += urlSummary.blockingTime;
-
-      // This is the time the product resource is fetched.
-      // Any resources of the same entity fetched after this point are considered as part of this product.
-      productSummary.startOfProductRequests
-        = Math.min(productSummary.startOfProductRequests, urlSummary.firstEndTime);
-
-      productSummaries.set(product.name, productSummary);
+      });
       entitySummaries.set(entity.name, productSummaries);
     }
 
-    // The second pass finds all other resources belonging to one of the products found above.
+    // The second pass finds the first request for any products found in the first pass.
     for (const [url, urlSummary] of byURL) {
       const entity = thirdPartyWeb.getEntity(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
 
-      const product = thirdPartyWeb.getProduct(url);
-      if (product && product.facades && product.facades.length) continue;
+      const productSummaries = entitySummaries.get(entity.name);
+      if (!productSummaries) continue;
+
+      const productNames = this.firstResourceProductNames(url);
+      if (!productNames.length) continue;
+
+      for (const productName of productNames) {
+        const productSummary = productSummaries.get(productName);
+        if (!productSummary) continue;
+
+        productSummary.urlSummaries.set(url, urlSummary);
+        productSummary.transferSize += urlSummary.transferSize;
+        productSummary.blockingTime += urlSummary.blockingTime;
+
+        // This is the time the product resource is fetched.
+        // Any resources of the same entity fetched after this point are considered as part of this product.
+        productSummary.startOfProductRequests
+          = Math.min(productSummary.startOfProductRequests, urlSummary.firstEndTime);
+
+        productSummaries.set(productName, productSummary);
+      }
+      entitySummaries.set(entity.name, productSummaries);
+    }
+
+    // The third pass finds all other resources belonging to one of the products found above.
+    for (const [url, urlSummary] of byURL) {
+      const entity = thirdPartyWeb.getEntity(url);
+      if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
+
+      // The first resource was already counted.
+      if (this.firstResourceProductNames(url).length) continue;
 
       const productSummaries = entitySummaries.get(entity.name);
       if (!productSummaries) continue;
@@ -161,6 +204,8 @@ class ThirdPartyFacades extends Audit {
     const allProductSummaries = [];
     for (const productSummaries of entitySummaries.values()) {
       for (const productSummary of productSummaries.values()) {
+        // Ignore any product where a first request could not be found.
+        if (productSummary.startOfProductRequests === Infinity) continue;
         allProductSummaries.push(productSummary);
       }
     }
@@ -190,7 +235,7 @@ class ThirdPartyFacades extends Audit {
     const results = [];
     for (const productSummary of productSummaries) {
       const product = productSummary.product;
-      const categoryTemplate = CATEGORY_UI_MAP.get(product.categories[0]);
+      const categoryTemplate = CATEGORY_UI_MAP[product.categories[0]];
 
       let productWithCategory;
       if (categoryTemplate) {
