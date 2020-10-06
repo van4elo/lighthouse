@@ -1352,9 +1352,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "Reduce the impact of third-party code"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "Other resources"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "Minimize third-party usage"
   },
@@ -1738,6 +1735,9 @@
   },
   "lighthouse-core/lib/i18n/i18n.js | otherResourceType": {
     "message": "Other"
+  },
+  "lighthouse-core/lib/i18n/i18n.js | otherValue": {
+    "message": "Other resources"
   },
   "lighthouse-core/lib/i18n/i18n.js | scriptResourceType": {
     "message": "Script"

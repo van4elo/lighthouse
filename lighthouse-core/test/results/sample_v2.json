@@ -1783,9 +1783,7 @@
                   "url": "http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js",
                   "mainThreadTime": 90.36300000000001,
                   "blockingTime": 22.918000000000006,
-                  "transferSize": 30174,
-                  "firstStartTime": 185607.195975,
-                  "firstContentAvailable": 185607.822806
+                  "transferSize": 30174
                 }
               ]
             }
