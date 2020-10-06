@@ -119,6 +119,25 @@ class ThirdPartyFacades extends Audit {
   }
 
   /**
+   * @param {(ThirdPartySummary.Summary & {url: string | LH.IcuMessage})[]} items
+   */
+  static condenseItems(items) {
+    const splitIndex = items.findIndex((item) => item.transferSize < 1000);
+    if (splitIndex === -1) return;
+
+    const remainder = items.splice(splitIndex);
+    const finalItem = remainder.reduce((result, item) => {
+      result.transferSize += item.transferSize;
+      result.blockingTime += item.blockingTime;
+      result.mainThreadTime += item.mainThreadTime;
+      return result;
+    });
+    finalItem.url = str_(i18n.UIStrings.otherValue);
+    finalItem.firstStartTime = finalItem.firstContentAvailable = 0;
+    items.push(finalItem);
+  }
+
+  /**
    * @param {Map<string, ThirdPartySummary.Summary>} byURL
    * @param {ThirdPartyEntity | undefined} mainEntity
    * @return {FacadableProductSummary[]}
@@ -251,6 +270,7 @@ class ThirdPartyFacades extends Audit {
           return {url, ...urlStats};
         })
         .sort((a, b) => b.transferSize - a.transferSize);
+      this.condenseItems(items);
       results.push({
         product: productWithCategory,
         transferSize: productSummary.transferSize,

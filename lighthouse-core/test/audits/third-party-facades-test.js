@@ -280,6 +280,62 @@ describe('Third party facades audit', () => {
     ]);
   });
 
+  it('condenses items under 1KB', async () => {
+    const artifacts = {
+      devtoolsLogs: {
+        defaultPass: networkRecordsToDevtoolsLog([
+          resourceEntry(100, 101, 102, 2000, 'https://example.com'),
+          intercomProductEntry(200, 201, 202, 4000, '1'),
+          intercomResourceEntry(300, 301, 302, 2000, 'a'),
+          intercomResourceEntry(310, 311, 312, 800, 'b'),
+          intercomResourceEntry(320, 321, 322, 0, 'c'),
+        ]),
+      },
+      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
+      URL: {finalUrl: 'https://example.com'},
+    };
+
+    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
+    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
+    expect(results.details.items).toMatchObject([
+      {
+        transferSize: 6800,
+        blockingTime: 0,
+        subItems: {
+          type: 'subitems',
+          items: [
+            {
+              url: 'https://widget.intercom.io/widget/1',
+              mainThreadTime: 0,
+              blockingTime: 0,
+              transferSize: 4000,
+              firstStartTime: 200,
+              firstContentAvailable: 201,
+            },
+            {
+              url: 'https://js.intercomcdn.com/frame-modern.a.js',
+              mainThreadTime: 0,
+              blockingTime: 0,
+              transferSize: 2000,
+              firstStartTime: 300,
+              firstContentAvailable: 301,
+            },
+            {
+              url: {
+                formattedDefault: 'Other resources',
+              },
+              mainThreadTime: 0,
+              blockingTime: 0,
+              transferSize: 800,
+              firstStartTime: 0,
+              firstContentAvailable: 0,
+            },
+          ],
+        },
+      },
+    ]);
+  });
+
   it('does not report first party resources', async () => {
     const artifacts = {
       devtoolsLogs: {
@@ -482,27 +538,13 @@ describe('Third party facades audit', () => {
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47787.641538,
-                firstStartTime: 47786.499527,
+                firstContentAvailable: 0,
+                firstStartTime: 0,
                 mainThreadTime: 0,
-                transferSize: 818,
-                url: 'https://vimeo.com/ablincoln/vuid?pid=a88cdaf56540a693f597632ffeeaf6a38f56542a1600197631',
-              },
-              {
-                blockingTime: 0,
-                firstContentAvailable: 47786.70353599999,
-                firstStartTime: 47786.608785,
-                mainThreadTime: 0,
-                transferSize: 110,
-                url: 'https://fresnel.vimeocdn.com/add/player-stats?beacon=1&session-id=a88cdaf56540a693f597632ffeeaf6a38f56542a1600197631',
-              },
-              {
-                blockingTime: 0,
-                firstContentAvailable: 47786.06986,
-                firstStartTime: 47786.069794,
-                mainThreadTime: 0,
-                transferSize: 0,
-                url: 'http://player.vimeo.com/video/336812660',
+                transferSize: 928,
+                url: {
+                  formattedDefault: 'Other resources',
+                },
               },
             ],
             type: 'subitems',
