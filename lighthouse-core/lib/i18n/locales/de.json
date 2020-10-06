@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "Die Auswirkungen von Drittanbieter-Code minimieren"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "Weitere Ressourcen"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "Drittanbieternutzung minimieren"
   },

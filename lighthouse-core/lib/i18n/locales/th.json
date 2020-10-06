@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "ลดผลกระทบจากโค้ดของบุคคลที่สาม"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "ทรัพยากรอื่นๆ"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "ลดการใช้ของบุคคลที่สาม"
   },

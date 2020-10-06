@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "Reduza o impacto de códigos de terceiros"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "Outros recursos"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "Reduzir o uso de terceiros"
   },

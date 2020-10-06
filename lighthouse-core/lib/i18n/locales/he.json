@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "עליך להפחית את השפעת הקוד של צד שלישי"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "משאבים אחרים"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "צמצום השימוש בצדדים שלישיים"
   },

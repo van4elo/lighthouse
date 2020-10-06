@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "மூன்றாம் தரப்புக் குறியீட்டின் பாதிப்பைக் குறைக்கவும்"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "இதர மூலங்கள்"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "மூன்றாம் தரப்பு உபயோகத்தைக் குறைத்தல்"
   },

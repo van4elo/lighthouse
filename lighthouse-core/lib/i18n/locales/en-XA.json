@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "[Ŕéðûçé ţĥé îmþåçţ öƒ ţĥîŕð-þåŕţý çöðé one two three four five six seven eight]"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "[Öţĥéŕ ŕéšöûŕçéš one two]"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "[Mîñîmîžé ţĥîŕð-þåŕţý ûšåĝé one two three]"
   },

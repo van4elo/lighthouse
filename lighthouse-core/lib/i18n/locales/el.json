@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "Μείωση αντίκτυπου του κώδικα τρίτου μέρους"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "Άλλοι πόροι"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "Ελαχιστοποίηση χρήσης τρίτων μερών"
   },

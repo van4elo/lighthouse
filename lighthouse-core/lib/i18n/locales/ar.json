@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "تقليل تأثير رمز الجهة الخارجية"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "موارد أخرى"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "تقليل استخدام الرموز التابعة لجهات خارجية"
   },

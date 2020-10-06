@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "Reduser innvirkningen av tredjepartskode"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "Andre ressurser"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "Minimer bruken av tredjepartskode"
   },

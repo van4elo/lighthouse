@@ -1325,9 +1325,6 @@
   "lighthouse-core/audits/third-party-summary.js | failureTitle": {
     "message": "타사 코드의 영향을 줄임"
   },
-  "lighthouse-core/audits/third-party-summary.js | otherValue": {
-    "message": "기타 리소스"
-  },
   "lighthouse-core/audits/third-party-summary.js | title": {
     "message": "타사 사용량 최소화"
   },
