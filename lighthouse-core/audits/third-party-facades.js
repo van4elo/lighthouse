@@ -94,7 +94,7 @@ class ThirdPartyFacades extends Audit {
   }
 
   /**
-   * @param {(ThirdPartySummary.URLSummary & {url: string | LH.IcuMessage})[]} items
+   * @param {(ThirdPartySummary.URLSummary)[]} items
    */
   static condenseItems(items) {
     const splitIndex = items.findIndex((item) => item.transferSize < 1000);
