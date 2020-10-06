@@ -43,8 +43,6 @@ describe('Third party summary', () => {
               blockingTime: 18.186999999999998,
               mainThreadTime: 127.15300000000003,
               transferSize: 30827,
-              firstStartTime: 225414.728913,
-              firstContentAvailable: 225414.940324,
               url: 'https://www.googletagmanager.com/gtm.js?id=GTM-Q5SW',
             },
           ],
@@ -66,8 +64,6 @@ describe('Third party summary', () => {
               blockingTime: 0,
               mainThreadTime: 55.246999999999986,
               transferSize: 12906,
-              firstStartTime: 225415.251281,
-              firstContentAvailable: 225415.469618,
               url: 'https://www.google-analytics.com/analytics.js',
             },
             {

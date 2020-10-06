@@ -81,16 +81,12 @@ describe('Third party facades audit', () => {
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 8000,
-              firstStartTime: 300,
-              firstContentAvailable: 301,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 4000,
-              firstStartTime: 200,
-              firstContentAvailable: 201,
             },
           ],
         },
@@ -133,16 +129,12 @@ describe('Third party facades audit', () => {
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 8000,
-              firstStartTime: 300,
-              firstContentAvailable: 301,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 4000,
-              firstStartTime: 200,
-              firstContentAvailable: 201,
             },
           ],
         },
@@ -158,16 +150,12 @@ describe('Third party facades audit', () => {
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 7000,
-              firstStartTime: 310,
-              firstContentAvailable: 311,
             },
             {
               url: 'https://www.youtube.com/embed/2',
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 3000,
-              firstStartTime: 210,
-              firstContentAvailable: 211,
             },
           ],
         },
@@ -209,70 +197,12 @@ describe('Third party facades audit', () => {
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 8000,
-              firstStartTime: 300,
-              firstContentAvailable: 301,
             },
             {
               url: 'https://widget.intercom.io/widget/1',
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 4000,
-              firstStartTime: 200,
-              firstContentAvailable: 201,
-            },
-          ],
-        },
-      },
-    ]);
-  });
-
-  it('uses receiveHeadersEnd to mark start of product requests', async () => {
-    const artifacts = {
-      devtoolsLogs: {
-        defaultPass: networkRecordsToDevtoolsLog([
-          resourceEntry(100, 101, 102, 2000, 'https://example.com'),
-          intercomProductEntry(200, 205, 210, 4000, '1'),
-          // Starts between product's startTime and startTime + receiveHeadersEnd, so it is ignored
-          intercomResourceEntry(201, 206, 208, 8000, 'a'),
-          // Starts between product's startTime + receiveHeadersEnd and endTime, so it is included
-          intercomResourceEntry(206, 208, 215, 8000, 'b'),
-          // Starts past the cutoff but previous call to same url was before cutoff, so it is ignored
-          intercomResourceEntry(300, 301, 303, 8000, 'a'),
-        ]),
-      },
-      traces: {defaultPass: createTestTrace({timeOrigin: 0, traceEnd: 2000})},
-      URL: {finalUrl: 'https://example.com'},
-    };
-
-    const settings = {throttlingMethod: 'simulate', throttling: {cpuSlowdownMultiplier: 4}};
-    const results = await ThirdPartyFacades.audit(artifacts, {computedCache: new Map(), settings});
-
-    expect(results.score).toBe(0);
-    expect(results.displayValue).toBeDisplayString('1 facade alternative available');
-    expect(results.details.items[0].product)
-      .toBeDisplayString('Intercom Widget (Customer Success)');
-    expect(results.details.items).toMatchObject([
-      {
-        transferSize: 12000,
-        blockingTime: 0,
-        subItems: {
-          type: 'subitems',
-          items: [
-            {
-              url: 'https://js.intercomcdn.com/frame-modern.b.js',
-              mainThreadTime: 0,
-              blockingTime: 0,
-              transferSize: 8000,
-              firstStartTime: 206,
-              firstContentAvailable: 208,
-            },
-            {
-              url: 'https://widget.intercom.io/widget/1',
-              mainThreadTime: 0,
-              blockingTime: 0,
-              transferSize: 4000,
-              firstStartTime: 200,
-              firstContentAvailable: 205,
             },
           ],
         },
@@ -309,16 +239,12 @@ describe('Third party facades audit', () => {
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 4000,
-              firstStartTime: 200,
-              firstContentAvailable: 201,
             },
             {
               url: 'https://js.intercomcdn.com/frame-modern.a.js',
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 2000,
-              firstStartTime: 300,
-              firstContentAvailable: 301,
             },
             {
               url: {
@@ -327,8 +253,6 @@ describe('Third party facades audit', () => {
               mainThreadTime: 0,
               blockingTime: 0,
               transferSize: 800,
-              firstStartTime: 0,
-              firstContentAvailable: 0,
             },
           ],
         },
@@ -417,64 +341,48 @@ describe('Third party facades audit', () => {
             items: [
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.347774999995,
-                firstStartTime: 47786.326268,
                 mainThreadTime: 0,
                 transferSize: 459603,
                 url: 'https://www.youtube.com/s/player/e0d83c30/player_ias.vflset/en_US/base.js',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.692717,
-                firstStartTime: 47786.569798,
                 mainThreadTime: 0,
                 transferSize: 66273,
                 url: 'https://i.ytimg.com/vi/tgbNymZ7vqY/maxresdefault.jpg',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.436251,
-                firstStartTime: 47786.325979,
                 mainThreadTime: 0,
                 transferSize: 50213,
                 url: 'https://www.youtube.com/s/player/e0d83c30/www-embed-player.vflset/www-embed-player.js',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.441221,
-                firstStartTime: 47786.324095,
                 mainThreadTime: 0,
                 transferSize: 46813,
                 url: 'https://www.youtube.com/s/player/e0d83c30/www-player.css',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.580910000004,
-                firstStartTime: 47786.561199,
                 mainThreadTime: 0,
                 transferSize: 11477,
                 url: 'https://www.youtube.com/s/player/e0d83c30/player_ias.vflset/en_US/embed.js',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.303873000004,
-                firstStartTime: 47786.066226,
                 mainThreadTime: 0,
                 transferSize: 10703,
                 url: 'https://www.youtube.com/embed/tgbNymZ7vqY',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.414732000005,
-                firstStartTime: 47786.326585,
                 mainThreadTime: 0,
                 transferSize: 3191,
                 url: 'https://www.youtube.com/yts/jsbin/fetch-polyfill-vfl6MZH8P/fetch-polyfill.js',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.679700999994,
-                firstStartTime: 47786.568895,
                 mainThreadTime: 0,
                 transferSize: 3077,
                 url: 'https://yt3.ggpht.com/a/AATXAJxtCYVD65XPtigYUOad-Nd2v3EvnXnz__MkJrg=s68-c-k-c0x00ffffff-no-rj',
@@ -490,56 +398,42 @@ describe('Third party facades audit', () => {
             items: [
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.422034999996,
-                firstStartTime: 47786.323843,
                 mainThreadTime: 0,
                 transferSize: 145772,
                 url: 'https://f.vimeocdn.com/p/3.22.3/js/player.js',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.422311999995,
-                firstStartTime: 47786.324528,
                 mainThreadTime: 0,
                 transferSize: 17633,
                 url: 'https://f.vimeocdn.com/p/3.22.3/css/player.css',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.634061000004,
-                firstStartTime: 47786.606134,
                 mainThreadTime: 0,
                 transferSize: 9313,
                 url: 'https://i.vimeocdn.com/video/784397921.webp?mw=1200&mh=675&q=70',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.291588,
-                firstStartTime: 47786.074447,
                 mainThreadTime: 0,
                 transferSize: 8300,
                 url: 'https://player.vimeo.com/video/336812660',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.47053,
-                firstStartTime: 47786.325692,
                 mainThreadTime: 0,
                 transferSize: 1474,
                 url: 'https://f.vimeocdn.com/js_opt/modules/utils/vuid.min.js',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 47786.417184000005,
-                firstStartTime: 47786.32147,
                 mainThreadTime: 0,
                 transferSize: 1075,
                 url: 'https://i.vimeocdn.com/video/784397921.jpg?mw=80&q=85',
               },
               {
                 blockingTime: 0,
-                firstContentAvailable: 0,
-                firstStartTime: 0,
                 mainThreadTime: 0,
                 transferSize: 928,
                 url: {

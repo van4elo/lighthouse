@@ -69,27 +69,14 @@ const CATEGORY_UI_MAP = {
   'social': UIStrings.categorySocial,
 };
 
-/** @type {Record<string, RegExp>} */
-const DEFERRABLE_PRODUCT_FIRST_RESOURCE = {
-  'Facebook Messenger Customer Chat': /connect\.facebook.net\/.*\/sdk\/xfbml\.customerchat\.js/,
-  'YouTube Embedded Player': /youtube\.com\/embed\//,
-  'Help Scout Beacon': /beacon-v2\.helpscout\.net/,
-  'Vimeo Embedded Player': /player\.vimeo\.com\/video\//,
-  'Drift Live Chat': /js\.driftt\.com\/include\/.*\/.*\.js/,
-  'Intercom Widget': /widget\.intercom\.io\/widget\/.*/,
-};
-
 /** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
 /** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
 /** @typedef {import("third-party-web").IFacade} ThirdPartyFacade*/
 
 /** @typedef {{
  *  product: ThirdPartyProduct,
- *  startOfProductRequests: number,
- *  transferSize: number,
- *  blockingTime: number,
- *  urlSummaries: Map<string, ThirdPartySummary.Summary>
- * }} FacadableProductSummary
+ *  entity: ThirdPartyEntity,
+ * }} FacadableProduct
  */
 
 class ThirdPartyFacades extends Audit {
@@ -107,19 +94,7 @@ class ThirdPartyFacades extends Audit {
   }
 
   /**
-   * @param {string} url
-   * @return {string[]}
-   */
-  static firstResourceProductNames(url) {
-    const productNames = [];
-    for (const [name, regex] of Object.entries(DEFERRABLE_PRODUCT_FIRST_RESOURCE)) {
-      if (regex.test(url)) productNames.push(name);
-    }
-    return productNames;
-  }
-
-  /**
-   * @param {(ThirdPartySummary.Summary & {url: string | LH.IcuMessage})[]} items
+   * @param {(ThirdPartySummary.URLSummary & {url: string | LH.IcuMessage})[]} items
    */
   static condenseItems(items) {
     const splitIndex = items.findIndex((item) => item.transferSize < 1000);
@@ -129,24 +104,20 @@ class ThirdPartyFacades extends Audit {
     const finalItem = remainder.reduce((result, item) => {
       result.transferSize += item.transferSize;
       result.blockingTime += item.blockingTime;
-      result.mainThreadTime += item.mainThreadTime;
       return result;
     });
     finalItem.url = str_(i18n.UIStrings.otherValue);
-    finalItem.firstStartTime = finalItem.firstContentAvailable = 0;
     items.push(finalItem);
   }
 
   /**
    * @param {Map<string, ThirdPartySummary.Summary>} byURL
    * @param {ThirdPartyEntity | undefined} mainEntity
-   * @return {FacadableProductSummary[]}
+   * @return {FacadableProduct[]}
    */
-  static getFacadableProductSummaries(byURL, mainEntity) {
-    /** @type {Map<string, Map<string, FacadableProductSummary>>} */
-    const entitySummaries = new Map();
-
-    // The first pass finds all requests to products that have a facade.
+  static getFacadableProducts(byURL, mainEntity) {
+    /** @type {Map<string, FacadableProduct>} */
+    const facadableProductMap = new Map();
     for (const url of byURL.keys()) {
       const entity = thirdPartyWeb.getEntity(url);
       if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
@@ -154,81 +125,11 @@ class ThirdPartyFacades extends Audit {
       const product = thirdPartyWeb.getProduct(url);
       if (!product || !product.facades || !product.facades.length) continue;
 
-      /** @type {Map<string, FacadableProductSummary>} */
-      const productSummaries = entitySummaries.get(entity.name) || new Map();
-      if (productSummaries.has(product.name)) continue;
-
-      productSummaries.set(product.name, {
-        product,
-        transferSize: 0,
-        blockingTime: 0,
-        startOfProductRequests: Infinity,
-        urlSummaries: new Map(),
-      });
-      entitySummaries.set(entity.name, productSummaries);
+      if (facadableProductMap.has(product.name)) continue;
+      facadableProductMap.set(product.name, {product, entity});
     }
 
-    // The second pass finds the first request for any products found in the first pass.
-    for (const [url, urlSummary] of byURL) {
-      const entity = thirdPartyWeb.getEntity(url);
-      if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
-
-      const productSummaries = entitySummaries.get(entity.name);
-      if (!productSummaries) continue;
-
-      const productNames = this.firstResourceProductNames(url);
-      if (!productNames.length) continue;
-
-      for (const productName of productNames) {
-        const productSummary = productSummaries.get(productName);
-        if (!productSummary) continue;
-
-        productSummary.urlSummaries.set(url, urlSummary);
-        productSummary.transferSize += urlSummary.transferSize;
-        productSummary.blockingTime += urlSummary.blockingTime;
-
-        // This is the time the product resource is fetched.
-        // Any resources of the same entity fetched after this point are considered as part of this product.
-        productSummary.startOfProductRequests
-          = Math.min(productSummary.startOfProductRequests, urlSummary.firstContentAvailable);
-
-        productSummaries.set(productName, productSummary);
-      }
-      entitySummaries.set(entity.name, productSummaries);
-    }
-
-    // The third pass finds all other resources belonging to one of the products found above.
-    for (const [url, urlSummary] of byURL) {
-      const entity = thirdPartyWeb.getEntity(url);
-      if (!entity || thirdPartyWeb.isFirstParty(url, mainEntity)) continue;
-
-      // The first resource was already counted.
-      if (this.firstResourceProductNames(url).length) continue;
-
-      const productSummaries = entitySummaries.get(entity.name);
-      if (!productSummaries) continue;
-
-      // If the url does not have a facade but one or more products on its entity do,
-      // we still want to record this url because it was probably fetched by a product with a facade.
-      for (const productSummary of productSummaries.values()) {
-        if (urlSummary.firstStartTime < productSummary.startOfProductRequests) continue;
-        productSummary.urlSummaries.set(url, urlSummary);
-        productSummary.transferSize += urlSummary.transferSize;
-        productSummary.blockingTime += urlSummary.blockingTime;
-      }
-
-      entitySummaries.set(entity.name, productSummaries);
-    }
-
-    const allProductSummaries = [];
-    for (const productSummaries of entitySummaries.values()) {
-      for (const productSummary of productSummaries.values()) {
-        // Ignore any product where a first request could not be found.
-        if (productSummary.startOfProductRequests === Infinity) continue;
-        allProductSummaries.push(productSummary);
-      }
-    }
-    return allProductSummaries;
+    return Array.from(facadableProductMap.values());
   }
 
   /**
@@ -246,14 +147,13 @@ class ThirdPartyFacades extends Audit {
     const tasks = await MainThreadTasks.request(trace, context);
     const multiplier = settings.throttlingMethod === 'simulate' ?
       settings.throttling.cpuSlowdownMultiplier : 1;
-    const thirdPartySummaries = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
-    const productSummaries
-      = ThirdPartyFacades.getFacadableProductSummaries(thirdPartySummaries.byURL, mainEntity);
+    const summaries = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
+    const facadableProducts
+      = ThirdPartyFacades.getFacadableProducts(summaries.byURL, mainEntity);
 
     /** @type {LH.Audit.Details.TableItem[]} */
     const results = [];
-    for (const productSummary of productSummaries) {
-      const product = productSummary.product;
+    for (const {product, entity} of facadableProducts) {
       const categoryTemplate = CATEGORY_UI_MAP[product.categories[0]];
 
       let productWithCategory;
@@ -265,16 +165,21 @@ class ThirdPartyFacades extends Audit {
         productWithCategory = product.name;
       }
 
-      const items = Array.from(productSummary.urlSummaries)
-        .map(([url, urlStats]) => {
-          return {url, ...urlStats};
+      const urls = summaries.urls.get(entity);
+      const entitySummary = summaries.byEntity.get(entity);
+      if (!urls || !entitySummary) continue;
+
+      const items = Array.from(urls)
+        .map((url) => {
+          const urlStats = summaries.byURL.get(url);
+          return /** @type {ThirdPartySummary.URLSummary} */ ({url, ...urlStats});
         })
         .sort((a, b) => b.transferSize - a.transferSize);
       this.condenseItems(items);
       results.push({
         product: productWithCategory,
-        transferSize: productSummary.transferSize,
-        blockingTime: productSummary.blockingTime,
+        transferSize: entitySummary.transferSize,
+        blockingTime: entitySummary.blockingTime,
         subItems: {type: 'subitems', items},
       });
     }
