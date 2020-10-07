@@ -113,9 +113,6 @@ class Accessibility extends Gatherer {
         throw new Error('Unable to parse axe results' + returnedValue);
       }
       return returnedValue;
-    }).then(results => {
-      console.log(results);
-      return results;
     });
   }
 }

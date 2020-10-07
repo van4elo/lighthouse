@@ -837,9 +837,7 @@ class GatherRunner {
     GatherRunner._addLoadDataToBaseArtifacts(passContext, loadData, passConfig.passName);
 
     // Run `afterPass()` on gatherers and return collected artifacts.
-    // await driver.sendCommand('Emulation.setScriptExecutionDisabled', {value: true});
     await GatherRunner.afterPass(passContext, loadData, gathererResults);
-    // await driver.sendCommand('Emulation.setScriptExecutionDisabled', {value: false});
     const artifacts = await GatherRunner.collectArtifacts(gathererResults);
 
     if (process.env.RESOLVE_NODES) {
