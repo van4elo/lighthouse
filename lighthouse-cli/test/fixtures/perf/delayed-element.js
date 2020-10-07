@@ -32,8 +32,12 @@ setTimeout(() => {
   textEl.textContent = 'Sorry!';
   textEl.style.height = '18px' // this height can be flaky so we set it manually
   const top = document.getElementById('late-content');
-  top.appendChild(imgEl);
-  top.appendChild(textEl);
+
+  // Use shadow DOM to verify devtoolsNodePath resolves through it
+  const shadowRoot = top.attachShadow({mode: 'open'});
+  const sectionEl = document.createElement('section');
+  sectionEl.append(imgEl, textEl);
+  shadowRoot.append(sectionEl);
 
   textEl.style.color = 'gray';
   textEl.style.backgroundColor = 'lightgrey';
