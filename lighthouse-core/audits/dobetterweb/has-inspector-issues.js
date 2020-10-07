@@ -12,54 +12,45 @@
 
 'use strict';
 
-/** @typedef {{issueType: string, description: LH.IcuMessage, requestUrl?: string}} IssueItem */
+/** @typedef {{url: string}} IssueSubItem */
+/** @typedef {{issueType: string|LH.IcuMessage, subItems: Array<IssueSubItem>}} IssueItem */
 
 const Audit = require('../audit.js');
 const i18n = require('../../lib/i18n/i18n.js');
 
 const UIStrings = {
+  /* eslint-disable max-len */
   /** Title of a Lighthouse audit that provides detail on various types of issues with the page. This descriptive title is shown to users when no issues were logged into the Chrome DevTools Issues panel. */
   title: 'No issues in the `Issues` panel in Chrome Devtools',
   /** Title of a Lighthouse audit that provides detail on various types of issues with the page. This descriptive title is shown to users when issues are detected and logged into the Chrome DevTools Issues panel. */
   failureTitle: 'Issues were logged in the `Issues` panel in Chrome Devtools',
   /** Description of a Lighthouse audit that tells the user why issues being logged to the Chrome DevTools Issues panel are a cause for concern and so should be fixed. This is displayed after a user expands the section to see more. No character length limits. */
-  description: 'Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. ' +
-  'They can come from network request failures, insufficient security controls, ' +
-  ' and other browser concerns. ',
+  description: 'Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls, and other browser concerns.',
   /** Table column header for the type of issue. */
-  columnIssueType: 'Issue',
+  columnIssueType: 'Issue Type',
   /** Message shown in a data table when the item is a SameSiteCookie issue. */
   sameSiteMessage: 'A cookie\'s [`SameSite`] attribute was not set or is invalid',
   /** Message shown in a data table when the item is a MixedContent issue. This is when some resources are loaded over an insecure HTTP connection. */
-  mixedContentMessage: 'Some resources like images, stylesheets or scripts ' +
-    'are being accessed over an insecure `HTTP` connection',
+  mixedContentMessage: 'Some resources like images, stylesheets or scripts are being accessed over an insecure `HTTP` connection',
   /** Message shown in a data table when the item is a BlockedByResponse issue. This is when a resource is blocked due to not being allowed by a Cross-Origin Embedder Policy. */
-  coepResourceBlockedMessage: 'A resource was blocked due to not being ' +
-    'allowed by a `Cross-Origin Embedder Policy`',
+  coepResourceBlockedMessage: 'A resource was blocked due to not being allowed by a `Cross-Origin Embedder Policy`',
   /** Message shown in a data table when the item is a BlockedByResponse issue. This is when a frame is blocked due to not being allowed by a Cross-Origin Embedder Policy. */
-  coepFrameBlockedMessage: 'A frame was blocked due to not being ' +
-    'allowed by a `Cross-Origin Embedder Policy`',
+  coepFrameBlockedMessage: 'A frame was blocked due to not being allowed by a `Cross-Origin Embedder Policy`',
   /** Message shown in a data table when the item is a BlockedByResponse issue. This is when navigation to a document with a Cross-Origin Opener Policy is blocked. */
-  coopIframeBlockedMessage: 'An iframe navigation to a document with ' +
-    'a `Cross-Origin Opener Policy` was blocked',
+  coopIframeBlockedMessage: 'An iframe navigation to a document with a `Cross-Origin Opener Policy` was blocked',
   /** Message shown in a data table when the item is a HeavyAds issue where an ad uses more than 4 megabytes of network bandwith. */
-  heavyAdsNetworkLimitMessage: 'The page contains ads that use ' +
-    'more than 4 megabytes of network bandwidth',
+  heavyAdsNetworkLimitMessage: 'The page contains ads that use more than 4 megabytes of network bandwidth',
   /** Message shown in a data table when the item is a HeavyAds issue where an ad has used the main thread for more than 60 seconds in total. */
-  heavyAdsCPUTotalLimitMessage: 'The page contains ads that use the ' +
-    'main thread for more than 60 seconds in total',
+  heavyAdsCPUTotalLimitMessage: 'The page contains ads that use the main thread for more than 60 seconds in total',
   /** Message shown in a data table when the item is a HeavyAds issue where an ad has used the main thread for more than 15 seconds in any 30 second window. */
-  heavyAdsCPUPeakLimitMessage: 'The page contains ads that use the ' +
-    'main thread for more than 15 seconds in a 30 second window',
+  heavyAdsCPUPeakLimitMessage: 'The page contains ads that use the main thread for more than 15 seconds in a 30 second window',
   /** Message shown in a data table when the item is a ContentSecurityPolicy issue where resources are blocked due to not being in the Content Security Policy header. */
-  cspUrlViolationMessage: 'The `Content Security Policy` of the page blocks some resources because ' +
-    'their origin is not included in the content security policy header',
+  cspUrlViolationMessage: 'The `Content Security Policy` of the page blocks some resources because their origin is not included in the content security policy header',
   /** Message shown in a data table when the item is a ContentSecurityPolicy issue where the Content Security Policy blocks inline execution of scripts and stylesheets. */
-  cspInlineViolationMessage: 'The `Content Security Policy` of the page blocks ' +
-    'inline execution of scripts and stylesheets',
+  cspInlineViolationMessage: 'The `Content Security Policy` of the page blocks inline execution of scripts and stylesheets',
   /** Message shown in a data table when the item is a ContentSecurityPolicy issue where the Content Security Policy blocks the use of the `eval` function in Javascript. */
-  cspEvalViolationMessage: 'The `Content Security Policy` of the site blocks ' +
-    'the use of `eval` in JavaScript',
+  cspEvalViolationMessage: 'The `Content Security Policy` of the site blocks the use of `eval` in JavaScript',
+  /* eslint-enable max-len */
 };
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);
@@ -100,83 +91,113 @@ class IssuesPanelEntries extends Audit {
   }
 
   /**
-   * @param {Array<LH.Crdp.Audits.MixedContentIssueDetails>} mixedContentIssues
-   * @return {Array<IssueItem>}
+   * @param {Array<LH.Crdp.Audits.MixedContentIssueDetails} mixedContentIssues
+   * @return {LH.Audit.Details.TableItem}
    */
-  static getMixedContentItems(mixedContentIssues) {
-    return mixedContentIssues.map(issue => {
-      const requestUrl = issue.request && issue.request.url;
-      return {
-        issueType: 'MixedContent',
-        description: str_(UIStrings.mixedContentMessage),
-        requestUrl: requestUrl || issue.mainResourceURL,
-      };
-    });
+  static getMixedContentRow(mixedContentIssues) {
+    const requestUrls = new Set();
+    for (const issue of mixedContentIssues) {
+      const requestUrl = (issue.request && issue.request.url) || issue.mainResourceURL;
+      if (requestUrl) {
+        requestUrls.add(requestUrl);
+      }
+    }
+    return {
+      issueType: 'Mixed Content',
+      subItems: {
+        type: 'subitems',
+        items: Array.from(requestUrls).map(url => {
+          return {
+            url,
+          };
+        }),
+      },
+    };
   }
 
   /**
    * @param {Array<LH.Crdp.Audits.SameSiteCookieIssueDetails>} sameSiteCookieIssues
-   * @return {Array<IssueItem>}
+   * @return {LH.Audit.Details.TableItem}
    */
-  static getSameSiteCookieItems(sameSiteCookieIssues) {
-    return sameSiteCookieIssues.map(issue => {
-      const requestUrl = issue.request && issue.request.url;
-      return {
-        issueType: 'SameSiteCookie',
-        description: str_(UIStrings.sameSiteMessage),
-        requestUrl: requestUrl || issue.cookieUrl,
-      };
-    });
+  static getSameSiteCookieRow(sameSiteCookieIssues) {
+    const requestUrls = new Set();
+    for (const issue of sameSiteCookieIssues) {
+      const requestUrl = (issue.request && issue.request.url) || issue.cookieUrl;
+      if (requestUrl) {
+        requestUrls.add(requestUrl);
+      }
+    }
+    return {
+      issueType: 'SameSite Cookie',
+      subItems: {
+        type: 'subitems',
+        items: Array.from(requestUrls).map(url => {
+          return {
+            url,
+          };
+        }),
+      },
+    };
   }
 
   /**
    * @param {Array<LH.Crdp.Audits.BlockedByResponseIssueDetails>} blockedByResponseIssues
-   * @return {Array<IssueItem>}
+   * @return {LH.Audit.Details.TableItem}
    */
-  static getBlockedByResponseItems(blockedByResponseIssues) {
-    return blockedByResponseIssues.map(issue => {
-      const blockedReason = issue.reason;
-      return {
-        issueType: 'BlockedByResponse',
-        description: blockedByResponseMsgMap[blockedReason],
-        requestUrl: issue.request.url,
-      };
-    });
+  static getBlockedByResponseRow(blockedByResponseIssues) {
+    const requestUrls = new Set();
+    for (const issue of blockedByResponseIssues) {
+      const requestUrl = issue.request && issue.request.url;
+      if (requestUrl) {
+        requestUrls.add(requestUrl);
+      }
+    }
+    return {
+      issueType: 'Blocked By Response',
+      subItems: {
+        type: 'subitems',
+        items: Array.from(requestUrls).map(url => {
+          return {
+            url,
+          };
+        }),
+      },
+    };
   }
 
   /**
    * @param {Array<LH.Crdp.Audits.HeavyAdIssueDetails>} heavyAdsIssues
-   * @return {Array<IssueItem>}
+   * @return {LH.Audit.Details.TableItem}
    */
-  static getHeavyAdsItems(heavyAdsIssues) {
-    return heavyAdsIssues.map(issue => {
-      const reason = issue.reason;
-      return {
-        issueType: 'HeavyAds',
-        description: heavyAdsMsgMap[reason],
-      };
-    });
+  static getHeavyAdsRow(heavyAdsIssues) {
+    return {
+      issueType: 'Heavy Ads',
+    };
   }
 
   /**
    * @param {Array<LH.Crdp.Audits.ContentSecurityPolicyIssueDetails>} cspIssues
-   * @return {Array<IssueItem>}
+   * @return {LH.Audit.Details.TableItem}
    */
-  static getContentSecurityPolicyItems(cspIssues) {
-    return cspIssues
-    .filter(issue => {
-      // kTrustedTypesSinkViolation and kTrustedTypesPolicyViolation aren't currently supported by the Issues panel
-      return issue.contentSecurityPolicyViolationType !== 'kTrustedTypesSinkViolation' &&
-        issue.contentSecurityPolicyViolationType !== 'kTrustedTypesPolicyViolation';
-    })
-    .map(issue => {
-      const blockedUrl = issue.blockedURL;
-      return {
-        issueType: 'ContentSecurityPolicy',
-        description: contentSecurityPolicyMsgMap[issue.contentSecurityPolicyViolationType],
-        requestUrl: blockedUrl,
-      };
-    });
+  static getContentSecurityPolicyRow(cspIssues) {  
+    const requestUrls = new Set();
+    for (const issue of cspIssues) {
+      const requestUrl = issue.blockedURL;
+      if (requestUrl) {
+        requestUrls.add(requestUrl);
+      }
+    }
+    return {
+      issueType: 'Blocked By Response',
+      subItems: {
+        type: 'subitems',
+        items: Array.from(requestUrls).map(url => {
+          return {
+            url,
+          };
+        }),
+      },
+    };  
   }
 
   /**
@@ -186,19 +207,23 @@ class IssuesPanelEntries extends Audit {
   static audit(artifacts) {
     /** @type {LH.Audit.Details.Table['headings']} */
     const headings = [
-      {key: 'issueType', itemType: 'text', text: str_(UIStrings.columnIssueType)},
-      {key: 'description', itemType: 'text', text: str_(i18n.UIStrings.columnDescription)},
-      {key: 'requestUrl', itemType: 'url', text: 'Request URL'},
+      {key: 'issueType', itemType: 'text', subItemsHeading: {key: 'url', itemType: 'url'}, text: str_(UIStrings.columnIssueType)},
     ];
 
     const issues = artifacts.InspectorIssues;
-    const items = [
-      ...this.getSameSiteCookieItems(issues.sameSiteCookies),
-      ...this.getMixedContentItems(issues.mixedContent),
-      ...this.getBlockedByResponseItems(issues.blockedByResponse),
-      ...this.getHeavyAdsItems(issues.heavyAds),
-      ...this.getContentSecurityPolicyItems(issues.contentSecurityPolicy),
-    ];
+    /** @type LH.Audit.Details.TableItem[] */
+    const items = [];
+
+    if (issues.mixedContent.length) items.push(this.getMixedContentRow(issues.mixedContent));
+    if (issues.sameSiteCookies.length) items.push(this.getSameSiteCookieRow(issues.sameSiteCookies));
+    if (issues.blockedByResponse.length) items.push(this.getBlockedByResponseRow(issues.blockedByResponse));
+    if (issues.heavyAds.length) items.push(this.getHeavyAdsRow(issues.heavyAds));
+    const cspIssues = issues.contentSecurityPolicy.filter(issue => {
+      // kTrustedTypesSinkViolation and kTrustedTypesPolicyViolation aren't currently supported by the Issues panel
+      return issue.contentSecurityPolicyViolationType !== 'kTrustedTypesSinkViolation' &&
+        issue.contentSecurityPolicyViolationType !== 'kTrustedTypesPolicyViolation';
+    });
+    if (cspIssues.length) items.push(this.getContentSecurityPolicyRow(cspIssues));
 
     return {
       score: items.length > 0 ? 0 : 1,

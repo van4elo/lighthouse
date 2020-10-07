@@ -59,27 +59,21 @@ class InspectorIssues extends Gatherer {
     };
 
     for (const issue of this._issues) {
-      switch (issue.code) {
-        case 'MixedContentIssue':
-          issue.details.mixedContentIssueDetails &&
-            artifact.mixedContent.push(issue.details.mixedContentIssueDetails);
-          break;
-        case 'SameSiteCookieIssue':
-          issue.details.sameSiteCookieIssueDetails &&
-            artifact.sameSiteCookies.push(issue.details.sameSiteCookieIssueDetails);
-          break;
-        case 'BlockedByResponseIssue':
-          issue.details.blockedByResponseIssueDetails &&
-            artifact.blockedByResponse.push(issue.details.blockedByResponseIssueDetails);
-          break;
-        case 'HeavyAdIssue':
-          issue.details.heavyAdIssueDetails &&
-            artifact.heavyAds.push(issue.details.heavyAdIssueDetails);
-          break;
-        case 'ContentSecurityPolicyIssue':
-          issue.details.contentSecurityPolicyIssueDetails &&
-            artifact.contentSecurityPolicy.push(issue.details.contentSecurityPolicyIssueDetails);
-      }
+        if (issue.details.mixedContentIssueDetails) {
+          artifact.mixedContent.push(issue.details.mixedContentIssueDetails);
+        }
+        if (issue.details.sameSiteCookieIssueDetails) {
+          artifact.sameSiteCookies.push(issue.details.sameSiteCookieIssueDetails);
+        }
+        if (issue.details.blockedByResponseIssueDetails) {
+          artifact.blockedByResponse.push(issue.details.blockedByResponseIssueDetails);
+        }
+        if (issue.details.heavyAdIssueDetails) {
+          artifact.heavyAds.push(issue.details.heavyAdIssueDetails);
+        }
+        if (issue.details.contentSecurityPolicyIssueDetails) {
+          artifact.contentSecurityPolicy.push(issue.details.contentSecurityPolicyIssueDetails);
+        }
     }
 
     return artifact;
