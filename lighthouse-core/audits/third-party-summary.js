@@ -44,13 +44,6 @@ const PASS_THRESHOLD_IN_MS = 250;
  */
 
 /**
- * @typedef EntitySummary
- * @property {number} mainThreadTime
- * @property {number} transferSize
- * @property {number} blockingTime
- */
-
-/**
  * @typedef URLSummary
  * @property {number} transferSize
  * @property {number} blockingTime
@@ -58,7 +51,7 @@ const PASS_THRESHOLD_IN_MS = 250;
  */
 
 /** @typedef SummaryMaps
- * @property {Map<ThirdPartyEntity, EntitySummary>} byEntity Map of impact summaries for each entity.
+ * @property {Map<ThirdPartyEntity, Summary>} byEntity Map of impact summaries for each entity.
  * @property {Map<string, Summary>} byURL Map of impact summaries for each URL.
  * @property {Map<ThirdPartyEntity, string[]>} urls Map of URLs under each entity.
  */
@@ -96,7 +89,7 @@ class ThirdPartySummary extends Audit {
   static getSummaries(networkRecords, mainThreadTasks, cpuMultiplier) {
     /** @type {Map<string, Summary>} */
     const byURL = new Map();
-    /** @type {Map<ThirdPartyEntity, EntitySummary>} */
+    /** @type {Map<ThirdPartyEntity, Summary>} */
     const byEntity = new Map();
     const defaultSummary = {mainThreadTime: 0, blockingTime: 0, transferSize: 0};
 
@@ -149,7 +142,7 @@ class ThirdPartySummary extends Audit {
   /**
    * @param {ThirdPartyEntity} entity
    * @param {SummaryMaps} summaries
-   * @param {EntitySummary} stats
+   * @param {Summary} stats
    * @return {Array<URLSummary>}
    */
   static makeSubItems(entity, summaries, stats) {
