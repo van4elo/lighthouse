@@ -503,21 +503,33 @@ class GatherRunner {
   }
 
   /**
+   * Gatherers can collect details about DOM nodes, including their position on the page.
+   * Layout shifts occuring after a gatherer runs can cause these positions to be incorrect,
+   * resulting in a poor experience for element screenshots.
+   * `getNodeDetails` maintains a collection of DOM objects in the page, which we can iterate
+   * to re-collect the bounding client rectangle. We also update the devtools node path.
+   * The old devtools node path is used as a lookup key. We walk the entire artifacts object
+   * to update all objects that reference an old devtools node path.
    * @param {Driver} driver
    * @param {Partial<LH.Artifacts>} artifacts
    */
   static async resolveNodes(driver, artifacts) {
     function resolveNodes() {
       return (window.__nodes || []).map(({key, node}) => {
-        return {key, rect: getBoundingClientRect(node)};
+        return {
+          key,
+          newBoundingRect: getBoundingClientRect(node),
+          newDevtoolsNodePath: getNodePath(node),
+        };
       });
     }
     const expression = `(function () {
       ${pageFunctions.getBoundingClientRectString};
+      ${pageFunctions.getNodePathString};
       return (${resolveNodes.toString()}());
     })()`;
 
-    /** @type {Array<{key: string, rect: any}>} */
+    /** @type {Array<{key: string, newBoundingRect: any, newDevtoolsNodePath: string}>} */
     const resolved = await driver.evaluateAsync(expression, {useIsolation: true});
 
     console.log(' resolved ====');
@@ -528,15 +540,19 @@ class GatherRunner {
       if (!value || typeof value !== 'object') return;
       if (!value.path && !value.devtoolsNodePath) return;
 
-      const resolvedNode = resolved.find(r => r.key === value.path || r.key === value.devtoolsNodePath);
+      const resolvedNode = resolved.find(r => r.key === value.devtoolsNodePath);
       if (!resolvedNode) return;
 
-      console.log(resolvedNode.key, 'set to rect', resolvedNode.rect);
+      console.log(resolvedNode.key, 'set to rect', resolvedNode.newBoundingRect);
+
+      // Rects are stored on properties named either `boundingRect` or `clientRect`.
       if (value.boundingRect) {
-        value.boundingRect = resolvedNode.rect;
+        value.boundingRect = resolvedNode.newBoundingRect;
       } else if (value.clientRect) {
-        value.clientRect = resolvedNode.rect;
+        value.clientRect = resolvedNode.newBoundingRect;
       }
+
+      value.devtoolsNodePath = resolvedNode.newDevtoolsNodePath;
     });
   }
 

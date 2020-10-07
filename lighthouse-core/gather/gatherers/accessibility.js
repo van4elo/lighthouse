@@ -64,9 +64,6 @@ function runA11yChecks() {
         Object.assign(node, getNodeDetails(node.element));
         // avoid circular JSON concerns
         node.element = node.any = node.all = node.none = undefined;
-
-        window.__nodes = window.__nodes || [];
-        window.__nodes.push({key: node.path, node: node.element});
       });
 
       // Ensure errors can be serialized over the protocol

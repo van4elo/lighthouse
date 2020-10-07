@@ -447,19 +447,30 @@ function wrapRequestIdleCallback(cpuSlowdownMultiplier) {
   };
 }
 
-const getNodeDetailsString = `function getNodeDetails(elem) {
+/**
+ * @param {HTMLElement} element
+ */
+function getNodeDetails(element) {
+  const details = {
+    devtoolsNodePath: getNodePath(element),
+    selector: getNodeSelector(element),
+    boundingRect: getBoundingClientRect(element),
+    snippet: getOuterHTMLSnippet(element),
+    nodeLabel: getNodeLabel(element),
+  };
+  window.__nodes = window.__nodes || [];
+  window.__nodes.push({key: details.devtoolsNodePath, node: element});
+  return details;
+}
+
+const getNodeDetailsString = `function getNodeDetails(element) {
   ${getNodePath.toString()};
   ${getNodeSelector.toString()};
   ${getBoundingClientRect.toString()};
   ${getOuterHTMLSnippet.toString()};
   ${getNodeLabel.toString()};
-  return {
-    devtoolsNodePath: getNodePath(elem),
-    selector: getNodeSelector(elem),
-    boundingRect: getBoundingClientRect(elem),
-    snippet: getOuterHTMLSnippet(elem),
-    nodeLabel: getNodeLabel(elem),
-  };
+  ${getNodeDetails.toString()};
+  return getNodeDetails(element);
 }`;
 
 module.exports = {
