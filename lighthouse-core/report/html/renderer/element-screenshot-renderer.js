@@ -18,6 +18,22 @@
 /** @typedef {{width: number, height: number}} Size */
 
 /**
+ * Returns whether rect2 is contained entirely within rect1;
+ * @param {LH.Artifacts.Rect} rect1
+ * @param {LH.Artifacts.Rect} rect2
+ * @return {boolean}
+ */
+// We sometimes run this as a part of a gatherer script injected into the page, so prevent
+// renaming the function for code coverage.
+/* istanbul ignore next */
+function rectContains(rect1, rect2) {
+  return rect2.top >= rect1.top &&
+    rect2.right <= rect1.right &&
+    rect2.bottom <= rect1.bottom &&
+    rect2.left >= rect1.left;
+}
+
+/**
  * @param {number} value
  * @param {number} min
  * @param {number} max
@@ -153,13 +169,16 @@ class ElementScreenshotRenderer {
         top: Number(el.dataset['rectTop']),
         bottom: Number(el.dataset['rectTop']) + Number(el.dataset['rectHeight']),
       };
-      overlay.appendChild(ElementScreenshotRenderer.render(
+      const screenshotElement = ElementScreenshotRenderer.render(
         dom,
         templateContext,
         fullPageScreenshot,
         elementRectSC,
         maxLightboxSize
-      ));
+      );
+      if (!screenshotElement) return;
+
+      overlay.appendChild(screenshotElement);
       overlay.addEventListener('click', () => {
         overlay.remove();
       });
@@ -188,14 +207,28 @@ class ElementScreenshotRenderer {
   /**
    * Renders an element with surrounding context from the full page screenshot.
    * Used to render both the thumbnail preview in details tables and the full-page screenshot in the lightbox.
+   * Returns null if element rect is outside screenshot bounds.
    * @param {DOM} dom
    * @param {ParentNode} templateContext
    * @param {LH.Audit.Details.FullPageScreenshot} fullPageScreenshot
    * @param {LH.Artifacts.Rect} elementRectSC Region of screenshot to highlight.
    * @param {Size} maxRenderSizeDC e.g. maxThumbnailSize or maxLightboxSize.
-   * @return {Element}
+   * @return {Element|null}
    */
   static render(dom, templateContext, fullPageScreenshot, elementRectSC, maxRenderSizeDC) {
+    const fullPageScreenshotRect = {
+      left: 0,
+      top: 0,
+      right: fullPageScreenshot.width,
+      bottom: fullPageScreenshot.height,
+      width: fullPageScreenshot.width,
+      height: fullPageScreenshot.height,
+    };
+    if (!rectContains(fullPageScreenshotRect, elementRectSC)) {
+      // Element is out of bounds of screenshot.
+      return null;
+    }
+
     const tmpl = dom.cloneTemplate('#tmpl-lh-element-screenshot', templateContext);
     const containerEl = dom.find('.lh-element-screenshot', tmpl);
 
