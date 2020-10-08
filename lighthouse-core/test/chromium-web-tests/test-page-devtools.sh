@@ -53,20 +53,10 @@ autoninja -C out/Default # Build devtools resources.
 cd -
 ln -s "$DEVTOOLS_PATH/out/Default/resources/inspector" "$DEVTOOLS_PATH/test/webtests/http/tests/inspector-sources"
 
-# Put requested url in file where test runner can see it.
-echo "<!DOCTYPE html><div id=\"page-url\">$1</div>" > "$DEVTOOLS_PATH/test/webtests/http/tests/devtools/lighthouse/resources/lighthouse-url-input.html"
-
 # Add test to run lighthouse in DevTools and print LHR.
 echo "
 (async function() {
-  await TestRunner.navigatePromise('resources/lighthouse-url-input.html');
-  const url = await TestRunner.evaluateInPageAsync(\`
-    (function(){
-      let e = document.getElementById('page-url');
-      return e.innerHTML;
-    })(); 
-  \`)
-  await TestRunner.navigatePromise(url);
+  await TestRunner.navigatePromise('$1');
 
   await TestRunner.loadModule('lighthouse_test_runner');
   await TestRunner.showPanel('lighthouse');
@@ -82,7 +72,6 @@ echo "
 # Kill background jobs and remove temporary files when script ends.
 cleanup() {
   rm "$DEVTOOLS_PATH/test/webtests/http/tests/inspector-sources"
-  rm "$DEVTOOLS_PATH/test/webtests/http/tests/devtools/lighthouse/resources/lighthouse-url-input.html"
   rm "$DEVTOOLS_PATH/test/webtests/http/tests/devtools/lighthouse/lighthouse-run-dt.js"
   kill ${SERVER_PID}
 }
