@@ -31,6 +31,7 @@ class FullPageScreenshot extends Gatherer {
   async _takeScreenshot(passContext, maxScreenshotHeight) {
     const driver = passContext.driver;
     const metrics = await driver.sendCommand('Page.getLayoutMetrics');
+    const deviceScaleFactor = await driver.evaluateAsync('window.devicePixelRatio');
 
     // Width should match emulated width, without considering content overhang.
     // Both layoutViewport and visualViewport capture this. visualViewport accounts
@@ -47,7 +48,7 @@ class FullPageScreenshot extends Gatherer {
       screenHeight: height,
       width,
       screenWidth: width,
-      deviceScaleFactor: 1,
+      deviceScaleFactor,
       scale: 1,
       positionX: 0,
       positionY: 0,
@@ -76,7 +77,9 @@ class FullPageScreenshot extends Gatherer {
    * @return {Promise<LH.Artifacts.FullPageScreenshot | null>}
    */
   async afterPass_(passContext) {
-    let screenshot = await this._takeScreenshot(passContext, MAX_SCREENSHOT_HEIGHT);
+    const deviceScaleFactor = await passContext.driver.evaluateAsync('window.devicePixelRatio');
+    const maxScreenshotHeight = Math.floor(MAX_SCREENSHOT_HEIGHT / deviceScaleFactor);
+    let screenshot = await this._takeScreenshot(passContext, maxScreenshotHeight);
 
     if (screenshot.data.length > MAX_DATA_URL_SIZE) {
       // Hitting the data URL size limit is rare, it only happens for pages on tall
