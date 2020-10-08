@@ -225,6 +225,7 @@ class ElementScreenshotRenderer {
       height: fullPageScreenshot.height,
     };
     if (!rectContains(fullPageScreenshotRect, elementRectSC)) {
+      // Element is out of bounds of screenshot.
       return null;
     }
 
