@@ -18,17 +18,9 @@ const networkRecordsToDevtoolsLog = require('../network-records-to-devtools-log.
 const Driver = require('../../gather/driver.js');
 const Connection = require('../../gather/connections/connection.js');
 const {createMockSendCommandFn} = require('./mock-commands.js');
+const {makeParamsOptional} = require('../test-utils.js');
 
 jest.mock('../../lib/stack-collector.js', () => () => Promise.resolve([]));
-
-/**
- * @template {unknown[]} TParams
- * @template TReturn
- * @param {(...args: TParams) => TReturn} fn
- */
-function makeParamsOptional(fn) {
-  return /** @type {(...args: RecursivePartial<TParams>) => TReturn} */ (fn);
-}
 
 const GatherRunner = {
   afterPass: makeParamsOptional(GatherRunner_.afterPass),
@@ -110,6 +102,9 @@ class EmulationDriver extends Driver {
   }
   registerRequestIdleCallbackWrap() {
     return Promise.resolve();
+  }
+  getImportantStorageWarning() {
+    return Promise.resolve(undefined);
   }
 }
 
@@ -415,6 +410,7 @@ describe('GatherRunner', function() {
       clearDataForOrigin: createCheck('calledClearStorage'),
       blockUrlPatterns: asyncFunc,
       setExtraHTTPHeaders: asyncFunc,
+      getImportantStorageWarning: asyncFunc,
     };
 
     return GatherRunner.setupDriver(driver, {settings: {}}).then(_ => {

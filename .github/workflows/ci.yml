@@ -29,8 +29,6 @@ jobs:
     - run: sudo apt-get install xvfb
     - name: yarn test-clients
       run: xvfb-run --auto-servernum yarn test-clients
-    - name: yarn test-bundle
-      run: xvfb-run --auto-servernum yarn test-bundle
     - name: yarn test-docs
       run: xvfb-run --auto-servernum yarn test-docs
     - name: yarn test-viewer
@@ -43,6 +41,9 @@ jobs:
     - run: yarn test-legacy-javascript
     - run: yarn i18n:checks
     - run: yarn dogfood-lhci
+
+    # Fail if any changes were written to any source files or generated untracked files (ex, from: build/build-cdt-lib.js).
+    - run: git add -A && git diff --cached --exit-code
 
     # buildtracker runs `git merge-base HEAD origin/master` which needs more history than depth=1. https://github.com/paularmstrong/build-tracker/issues/106
     - name: Deepen git fetch (for buildtracker)
@@ -59,9 +60,6 @@ jobs:
       with:
         name: dist
         path: dist/
-
-    # Fail if any changes were written to source files (ex, from: build/build-cdt-lib.js).
-    - run: git diff --exit-code
 
   # `unit` includes just unit and proto tests.
   unit:
@@ -113,6 +111,9 @@ jobs:
     - run: yarn diff:sample-json
       if: matrix.os == 'windows-latest'
 
+    # Fail if any changes were written to any source files or generated untracked files (ex, from -GA).
+    - run: git add -A && git diff --cached --exit-code
+
   # `smoke` runs as a matrix across 4 jobs:
   #  * The smoketest groups are split across two runners, to parallelize.
   #  * Then, those are run with both Chrome stable and ToT Chromium, in parallel
@@ -154,6 +155,9 @@ jobs:
     - name: Run smoke tests
       run: xvfb-run --auto-servernum yarn smoke --debug -j=1 --retries=2 --invert-match ${{ matrix.smoke-test-invert }} $SMOKE_GROUP_1
 
+    # Fail if any changes were written to source files.
+    - run: git diff --exit-code
+
   # Only run smoke tests for windows against stable chrome.
   smoke-windows:
     runs-on: windows-latest
@@ -172,3 +176,26 @@ jobs:
 
     - name: Run smoke tests
       run: yarn smoke --debug -j=1 --retries=2 dbw oopif offline lantern metrics
+
+  smoke-bundle:
+    runs-on: ubuntu-latest
+    name: smoke_bundle
+
+    steps:
+    - name: git clone
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+
+    - run: yarn --frozen-lockfile
+    - run: yarn build-devtools
+
+    - run: sudo apt-get install xvfb
+    - name: yarn test-bundle
+      run: xvfb-run --auto-servernum yarn test-bundle
+
+    # Fail if any changes were written to source files.
+    - run: git diff --exit-code

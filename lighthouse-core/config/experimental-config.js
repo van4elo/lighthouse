@@ -17,6 +17,7 @@ const config = {
     'autocomplete',
     'full-page-screenshot',
     'large-javascript-libraries',
+    'script-treemap-data',
     'preload-lcp-image',
   ],
   passes: [{
