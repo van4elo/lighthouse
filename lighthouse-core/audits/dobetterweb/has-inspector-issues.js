@@ -52,7 +52,7 @@ class IssuesPanelEntries extends Audit {
   }
 
   /**
-   * @param {Array<LH.Crdp.Audits.MixedContentIssueDetails} mixedContentIssues
+   * @param {Array<LH.Crdp.Audits.MixedContentIssueDetails>} mixedContentIssues
    * @return {LH.Audit.Details.TableItem}
    */
   static getMixedContentRow(mixedContentIssues) {
