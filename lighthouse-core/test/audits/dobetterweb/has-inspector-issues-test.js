@@ -11,15 +11,18 @@ const InspectorIssuesAudit =
 /* eslint-env jest */
 
 describe('Has inspector issues audit', () => {
-  it('passes when no issues are found', () => {
-    /** @type {LH.Artifacts.InspectorIssues} */
-    const issues = {
+  let issues;
+  beforeEach(() => {
+    issues = {
       mixedContent: [],
       sameSiteCookies: [],
       blockedByResponse: [],
       heavyAds: [],
       contentSecurityPolicy: [],
     };
+  });
+
+  it('passes when no issues are found', () => {
     const auditResult = InspectorIssuesAudit.audit({
       InspectorIssues: issues,
     });
@@ -27,93 +30,216 @@ describe('Has inspector issues audit', () => {
     expect(auditResult.details.items).toHaveLength(0);
   });
 
-  it('lists the correct description with the associated issue type', () => {
-    const issues = {
-      mixedContent: [
-        {
-          resolutionStatus: 'MixedContentBlocked',
-          insecureURL: 'www.mixedcontent.com',
-          mainResourceURL: 'www.mixedcontent.com',
+  it('correctly displays mixed content issues', () => {
+    const mixedContentIssues = [
+      {
+        resolutionStatus: 'MixedContentBlocked',
+        insecureURL: 'www.mixedcontent.com',
+        mainResourceURL: 'www.mixedcontent.com',
+      },
+      {
+        resolutionStatus: 'MixedContentWarning',
+        insecureURL: 'www.insecureurl.com',
+        mainResourceURL: 'www.inscureurl.com',
+        request: {
+          requestId: '1',
+          url: 'www.insecureurl.com/request',
         },
-      ],
-      sameSiteCookies: [
-        {
-          cookieUrl: 'www.samesitecookies.com',
-        },
-      ],
-      blockedByResponse: [
-        {
-          reason: 'CoepFrameResourceNeedsCoepHeader',
-          request: {
-            url: 'www.blockedbyresponse.com',
-          },
-        },
-        {
-          reason: 'CoopSandboxedIFrameCannotNavigateToCoopPage',
-          request: {
-            url: 'www.blockedbyresponse.com',
-          },
-        },
-        {
-          reason: 'CorpNotSameOriginAfterDefaultedToSameOriginByCoep',
-          request: {
-            url: 'www.blockedbyresponse.com',
-          },
-        },
-        {
-          reason: 'CorpNotSameOrigin',
-          request: {
-            url: 'www.blockedbyresponse.com',
-          },
-        },
-        {
-          reason: 'CorpNotSameSite',
-          request: {
-            url: 'www.blockedbyresponse.com',
-          },
-        },
-      ],
-      heavyAds: [
-        {
-          reason: 'NetworkTotalLimit',
-        },
-        {
-          reason: 'CpuTotalLimit',
-        },
-        {
-          reason: 'CpuPeakLimit',
-        },
-      ],
-      contentSecurityPolicy: [
-        {
-          contentSecurityPolicyViolationType: 'kInlineViolation',
-          blockedUrl: 'www.contentsecuritypolicy.com',
-        },
-        {
-          contentSecurityPolicyViolationType: 'kEvalViolation',
-          blockedUrl: 'www.contentsecuritypolicy.com',
-        },
-        {
-          contentSecurityPolicyViolationType: 'kURLViolation',
-          blockedUrl: 'www.contentsecuritypolicy.com',
-        },
-        // These last two should be filtered out as they aren't supported yet
-        {
-          contentSecurityPolicyViolationType: 'kTrustedTypesSinkViolation',
-          blockedUrl: 'www.contentsecuritypolicy.com',
-        },
-        {
-          contentSecurityPolicyViolationType: 'kTrustedTypesPolicyViolation',
-          blockedUrl: 'www.contentsecuritypolicy.com',
-        },
-      ],
-    };
+      },
+    ];
+    issues.mixedContent.push(...mixedContentIssues);
 
     const auditResult = InspectorIssuesAudit.audit({
       InspectorIssues: issues,
     });
     expect(auditResult.score).toBe(0);
-    expect(auditResult.details.items).toHaveLength(13);
-    expect(auditResult.details.items).toMatchSnapshot();
+    expect(auditResult.details.items[0]).toMatchObject({
+      issueType: 'Mixed Content',
+      subItems: {
+        type: 'subitems',
+        items: [
+          {
+            url: 'www.mixedcontent.com',
+          },
+          {
+            url: 'www.insecureurl.com/request',
+          },
+        ],
+      },
+    });
+  });
+
+  it('correctly displays SameSite cookie issues', () => {
+    const samesiteIssues = [
+      {
+        cookieUrl: 'www.samesitecookies.com',
+      },
+      {
+        request: {
+          requestId: '2',
+          url: 'www.samesiterequest.com',
+        },
+      },
+    ];
+    issues.sameSiteCookies.push(...samesiteIssues);
+
+    const auditResult = InspectorIssuesAudit.audit({
+      InspectorIssues: issues,
+    });
+    expect(auditResult.score).toBe(0);
+    expect(auditResult.details.items[0]).toMatchObject({
+      issueType: 'SameSite Cookie',
+      subItems: {
+        type: 'subitems',
+        items: [
+          {
+            url: 'www.samesitecookies.com',
+          },
+          {
+            url: 'www.samesiterequest.com',
+          },
+        ],
+      },
+    });
+  });
+
+  it('correctly displays Blocked By Response issues', () => {
+    const blockedByResponseIssues = [
+      {
+        reason: 'CoepFrameResourceNeedsCoepHeader',
+        request: {
+          url: 'www.coep.com',
+        },
+      },
+      {
+        reason: 'CoopSandboxedIFrameCannotNavigateToCoopPage',
+        request: {
+          url: 'www.coop.com',
+        },
+      },
+      {
+        reason: 'CorpNotSameOriginAfterDefaultedToSameOriginByCoep',
+        request: {
+          requestId: '3',
+        },
+      },
+      {
+        reason: 'CorpNotSameOrigin',
+        request: {
+          url: 'www.same-origin.com',
+        },
+      },
+      {
+        reason: 'CorpNotSameSite',
+        request: {
+          url: 'www.same-site.com',
+        },
+      },
+    ];
+    issues.blockedByResponse.push(...blockedByResponseIssues);
+
+    const auditResult = InspectorIssuesAudit.audit({
+      InspectorIssues: issues,
+    });
+    expect(auditResult.score).toBe(0);
+    expect(auditResult.details.items[0]).toMatchObject({
+      issueType: {
+        formattedDefault: 'Blocked By Response',
+      },
+      subItems: {
+        type: 'subitems',
+        items: [
+          {
+            url: 'www.coep.com',
+          },
+          {
+            url: 'www.coop.com',
+          },
+          {
+            url: 'www.same-origin.com',
+          },
+          {
+            url: 'www.same-site.com',
+          },
+        ],
+      },
+    });
+  });
+
+  it('correctly displays Heavy Ads issues', () => {
+    const heavyAdsIssues = [
+      {
+        resolution: 'HeavyAdBlocked',
+        reason: 'NetworkTotalLimit',
+      },
+      {
+        resolution: 'HeavyAdBlocked',
+        reason: 'CpuTotalLimit',
+      },
+      {
+        resolution: 'HeavyAdBlocked',
+        reason: 'CpuPeakLimit',
+      },
+    ];
+    issues.heavyAds.push(...heavyAdsIssues);
+
+    const auditResult = InspectorIssuesAudit.audit({
+      InspectorIssues: issues,
+    });
+    expect(auditResult.score).toBe(0);
+    expect(auditResult.details.items[0]).toMatchObject({
+      issueType: {
+        formattedDefault: 'Heavy Ads',
+      },
+    });
+  });
+
+  it('correctly displays Content Security Policy issues', () => {
+    const cspIssues = [
+      {
+        contentSecurityPolicyViolationType: 'kInlineViolation',
+        blockedURL: 'www.csp.com/inline-violation',
+      },
+      {
+        contentSecurityPolicyViolationType: 'kEvalViolation',
+        blockedURL: 'www.csp.com/eval-violation',
+      },
+      {
+        contentSecurityPolicyViolationType: 'kURLViolation',
+        blockedURL: 'www.csp.com/url-violation',
+      },
+      // These last two should be filtered out as they aren't supported yet
+      {
+        contentSecurityPolicyViolationType: 'kTrustedTypesSinkViolation',
+        blockedURL: 'www.csp.com/sink-violation',
+      },
+      {
+        contentSecurityPolicyViolationType: 'kTrustedTypesPolicyViolation',
+        blockedURL: 'www.csp.com/policy-violation',
+      },
+    ];
+    issues.contentSecurityPolicy.push(...cspIssues);
+
+    const auditResult = InspectorIssuesAudit.audit({
+      InspectorIssues: issues,
+    });
+    expect(auditResult.score).toBe(0);
+    expect(auditResult.details.items[0]).toMatchObject({
+      issueType: 'Content Security Policy',
+      subItems: {
+        type: 'subitems',
+        items: [
+          {
+            url: 'www.csp.com/inline-violation',
+          },
+          {
+            url: 'www.csp.com/eval-violation',
+          },
+          {
+            url: 'www.csp.com/url-violation',
+          },
+        ],
+      },
+    });
   });
 });

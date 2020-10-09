@@ -139,7 +139,7 @@ class IssuesPanelEntries extends Audit {
       }
     }
     return {
-      issueType: 'Blocked By Response',
+      issueType: 'Content Security Policy',
       subItems: {
         type: 'subitems',
         items: Array.from(requestUrls).map(url => {

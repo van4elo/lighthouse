@@ -2,7 +2,7 @@
   "environment": {
     "credits": {}
   },
-  "lighthouseVersion": "6.4.0",
+  "lighthouseVersion": "6.4.1",
   "fetchTime": "2018-03-13T00:55:45.840Z",
   "requestedUrl": "https://www.reddit.com/r/nba",
   "finalUrl": "https://www.reddit.com/r/nba",
@@ -24,12 +24,12 @@
       "uploadThroughputKbps": 675,
       "cpuSlowdownMultiplier": 4
     },
-    "auditMode": "/Users/cjamcl/src/lighthouse/lighthouse-core/test/fixtures/artifacts/perflog/",
+    "auditMode": "/Users/blasingame/code/lighthouse/lighthouse-core/test/fixtures/artifacts/perflog/",
     "gatherMode": false,
     "disableStorageReset": false,
     "emulatedFormFactor": "mobile",
     "internalDisableDeviceScreenEmulation": false,
-    "channel": "node",
+    "channel": "custom",
     "budgets": null,
     "locale": "en",
     "blockedUrlPatterns": null,
@@ -44,37 +44,37 @@
   "timing": {
     "entries": [
       {
-        "startTime": 710.73,
+        "startTime": 2509.68,
         "name": "lh:init:config",
-        "duration": 0.55,
+        "duration": 0.73,
         "entryType": "measure"
       },
       {
-        "startTime": 710.77,
+        "startTime": 2509.75,
         "name": "lh:config:requireAudits",
-        "duration": 0.5,
+        "duration": 0.65,
         "entryType": "measure"
       },
       {
-        "startTime": 711.29,
+        "startTime": 2510.43,
         "name": "lh:runner:run",
-        "duration": 2.3,
+        "duration": 14.92,
         "entryType": "measure"
       },
       {
-        "startTime": 713.52,
+        "startTime": 2525.26,
         "name": "lh:runner:auditing",
-        "duration": 0.03,
+        "duration": 0.02,
         "entryType": "measure"
       },
       {
-        "startTime": 713.57,
+        "startTime": 2525.32,
         "name": "lh:runner:generate",
         "duration": 0.02,
         "entryType": "measure"
       }
     ],
-    "total": 2.3
+    "total": 14.92
   },
   "i18n": {
     "rendererFormattedStrings": {
