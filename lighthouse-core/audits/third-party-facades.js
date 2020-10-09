@@ -93,6 +93,7 @@ class ThirdPartyFacades extends Audit {
    * @param {ThirdPartySummary.URLSummary[]} items
    */
   static condenseItems(items) {
+    items.sort((a, b) => b.transferSize - a.transferSize);
     const splitIndex = items.findIndex((item) => item.transferSize < 1000);
     if (splitIndex === -1) return;
 
@@ -165,12 +166,10 @@ class ThirdPartyFacades extends Audit {
       const entitySummary = summaries.byEntity.get(entity);
       if (!urls || !entitySummary) continue;
 
-      const items = Array.from(urls)
-        .map((url) => {
-          const urlStats = summaries.byURL.get(url);
-          return /** @type {ThirdPartySummary.URLSummary} */ ({url, ...urlStats});
-        })
-        .sort((a, b) => b.transferSize - a.transferSize);
+      const items = Array.from(urls).map((url) => {
+        const urlStats = summaries.byURL.get(url);
+        return /** @type {ThirdPartySummary.URLSummary} */ ({url, ...urlStats});
+      });
       this.condenseItems(items);
       results.push({
         product: productWithCategory,
