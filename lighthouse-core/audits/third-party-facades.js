@@ -14,6 +14,12 @@
  * Facade: Placeholder for a product which looks likes the actual product and replaces itself with that product when the user needs it.
  */
 
+/** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
+/** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
+/** @typedef {import("third-party-web").IFacade} ThirdPartyFacade*/
+
+/** @typedef {{product: ThirdPartyProduct, entity: ThirdPartyEntity}} FacadableProduct */
+
 const Audit = require('./audit.js');
 const i18n = require('../lib/i18n/i18n.js');
 const thirdPartyWeb = require('../lib/third-party-web.js');
@@ -69,16 +75,6 @@ const CATEGORY_UI_MAP = {
   'social': UIStrings.categorySocial,
 };
 
-/** @typedef {import("third-party-web").IEntity} ThirdPartyEntity */
-/** @typedef {import("third-party-web").IProduct} ThirdPartyProduct*/
-/** @typedef {import("third-party-web").IFacade} ThirdPartyFacade*/
-
-/** @typedef {{
- *  product: ThirdPartyProduct,
- *  entity: ThirdPartyEntity,
- * }} FacadableProduct
- */
-
 class ThirdPartyFacades extends Audit {
   /**
    * @return {LH.Audit.Meta}
@@ -115,7 +111,7 @@ class ThirdPartyFacades extends Audit {
    * @param {ThirdPartyEntity | undefined} mainEntity
    * @return {FacadableProduct[]}
    */
-  static getFacadableProducts(byURL, mainEntity) {
+  static getProductsWithFacade(byURL, mainEntity) {
     /** @type {Map<string, FacadableProduct>} */
     const facadableProductMap = new Map();
     for (const url of byURL.keys()) {
@@ -148,8 +144,8 @@ class ThirdPartyFacades extends Audit {
     const multiplier = settings.throttlingMethod === 'simulate' ?
       settings.throttling.cpuSlowdownMultiplier : 1;
     const summaries = ThirdPartySummary.getSummaries(networkRecords, tasks, multiplier);
-    const facadableProducts
-      = ThirdPartyFacades.getFacadableProducts(summaries.byURL, mainEntity);
+    const facadableProducts =
+      ThirdPartyFacades.getProductsWithFacade(summaries.byURL, mainEntity);
 
     /** @type {LH.Audit.Details.TableItem[]} */
     const results = [];
@@ -195,8 +191,8 @@ class ThirdPartyFacades extends Audit {
     const headings = [
       /* eslint-disable max-len */
       {key: 'product', itemType: 'text', subItemsHeading: {key: 'url', itemType: 'url'}, text: str_(UIStrings.columnProduct)},
-      {key: 'transferSize', granularity: 1, itemType: 'bytes', subItemsHeading: {key: 'transferSize'}, text: str_(i18n.UIStrings.columnTransferSize)},
-      {key: 'blockingTime', granularity: 1, itemType: 'ms', subItemsHeading: {key: 'blockingTime'}, text: str_(i18n.UIStrings.columnBlockingTime)},
+      {key: 'transferSize', itemType: 'bytes', subItemsHeading: {key: 'transferSize'}, granularity: 1, text: str_(i18n.UIStrings.columnTransferSize)},
+      {key: 'blockingTime', itemType: 'ms', subItemsHeading: {key: 'blockingTime'}, granularity: 1, text: str_(i18n.UIStrings.columnBlockingTime)},
       /* eslint-enable max-len */
     ];
 
