@@ -38,10 +38,12 @@ class InspectorIssues extends Gatherer {
 
   /**
    * @param {LH.Gatherer.PassContext} passContext
+   * @param {LH.Gatherer.LoadData} loadData
    * @return {Promise<LH.Artifacts['InspectorIssues']>}
    */
-  async afterPass(passContext) {
+  async afterPass(passContext, loadData) {
     const driver = passContext.driver;
+    const networkRecords = loadData.networkRecords;
 
     driver.off('Audits.issueAdded', this._onIssueAdded);
     await driver.sendCommand('Audits.disable');
@@ -60,13 +62,28 @@ class InspectorIssues extends Gatherer {
 
     for (const issue of this._issues) {
       if (issue.details.mixedContentIssueDetails) {
-        artifact.mixedContent.push(issue.details.mixedContentIssueDetails);
+        const issueDetails = issue.details.mixedContentIssueDetails;
+        const issueReqId = issueDetails.request && issueDetails.request.requestId;
+        if (issueReqId &&
+          networkRecords.find(req => req.requestId === issueReqId)) {
+          artifact.mixedContent.push(issueDetails);
+        }
       }
       if (issue.details.sameSiteCookieIssueDetails) {
-        artifact.sameSiteCookies.push(issue.details.sameSiteCookieIssueDetails);
+        const issueDetails = issue.details.sameSiteCookieIssueDetails;
+        const issueReqId = issueDetails.request && issueDetails.request.requestId;
+        if (issueReqId &&
+          networkRecords.find(req => req.requestId === issueReqId)) {
+          artifact.sameSiteCookies.push(issueDetails);
+        }
       }
       if (issue.details.blockedByResponseIssueDetails) {
-        artifact.blockedByResponse.push(issue.details.blockedByResponseIssueDetails);
+        const issueDetails = issue.details.blockedByResponseIssueDetails;
+        const issueReqId = issueDetails.request && issueDetails.request.requestId;
+        if (issueReqId &&
+          networkRecords.find(req => req.requestId === issueReqId)) {
+          artifact.blockedByResponse.push(issueDetails);
+        }
       }
       if (issue.details.heavyAdIssueDetails) {
         artifact.heavyAds.push(issue.details.heavyAdIssueDetails);
