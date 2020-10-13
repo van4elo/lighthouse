@@ -75,16 +75,17 @@ class PreloadLCPImageAudit extends Audit {
     });
 
     if (!lcpImageElement) return undefined;
-
     let lcpUrl;
     graph.traverse((node, traversalPath) => {
       if (node.type !== 'network') return;
       const record = node.record;
       const imageSource = lcpImageElement.src;
+      console.log(imageSource);
+      console.log(record.url);
       // Don't include the node itself or any CPU nodes in the initiatorPath
       const path = traversalPath.slice(1).filter(initiator => initiator.type === 'network');
       if (!PreloadLCPImageAudit.shouldPreloadRequest(record, mainResource, path, imageSource)) return;
-      lcpUrl = node.record.url;
+      lcpUrl = record.url;
     });
 
     return lcpUrl;
@@ -147,10 +148,6 @@ class PreloadLCPImageAudit extends Audit {
     const simulatorOptions = {trace, devtoolsLog, settings: context.settings};
     const lcpElement = artifacts.TraceElements
       .find(element => element.traceEventType === 'largest-contentful-paint');
-
-    /** @type {LH.Config.Settings} */
-    // @ts-expect-error
-    const settings = {};
 
     const [mainResource, lanternLCP, simulator] = await Promise.all([
       MainResource.request({devtoolsLog, URL}, context),

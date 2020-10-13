@@ -16,26 +16,11 @@ const networkRecordsToDevtoolsLog = require('../network-records-to-devtools-log.
 const createTestTrace = require('../create-test-trace.js');
 
 const defaultMainResourceUrl = 'https://www.example.com/';
-const defaultMainResource = {
-  requestId: '1',
-  url: defaultMainResourceUrl,
-  startTime: 0,
-  priority: 'VeryHigh',
-  timing: {
-    connectStart: 147.848,
-    connectEnd: 180.71,
-    sslStart: 151.87,
-    sslEnd: 180.704,
-    sendStart: 181.443,
-    sendEnd: 181.553,
-    receiveHeadersEnd: 500,
-  }
-};
 
 describe('Performance: preload-lcp audit', () => {
   const mockArtifacts = (networkRecords, finalUrl, imageUrl) => {
     return {
-      traces: {[PreloadLCPImage.DEFAULT_PASS]: createTestTrace({traceEnd: 5000})},
+      traces: {[PreloadLCPImage.DEFAULT_PASS]: createTestTrace({traceEnd: 5000, largestContentfulPaint: 2000})},
       devtoolsLogs: {[PreloadLCPImage.DEFAULT_PASS]: networkRecordsToDevtoolsLog(networkRecords)},
       URL: {finalUrl},
       TraceElements: [
@@ -103,6 +88,7 @@ describe('Performance: preload-lcp audit', () => {
     ];
 
     const artifacts = mockArtifacts(networkRecords, mainDocumentNodeUrl, imageUrl);
+    console.log(JSON.stringify(artifacts.traces[PreloadLCPImage.DEFAULT_PASS], null, 4));
     const context = {settings: {}, computedCache: new Map()};
     const results = PreloadLCPImage.audit(artifacts, context);
     expect(results.details).toBeDefined();
