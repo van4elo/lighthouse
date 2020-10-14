@@ -46,6 +46,7 @@ async function run() {
     ],
     assetPaths: [
       'images/**/*',
+      'manifest.json',
     ],
   });
 
