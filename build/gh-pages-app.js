@@ -34,14 +34,20 @@ const license = `/*
 */`;
 
 /**
+ * Literal string (representing JS, CSS, etc...), or an object with a path, which would
+ * be interpreted relative to opts.appDir and be glob-able.
+ * @typedef {{path: string} | string} Source
+ */
+
+/**
  * @typedef BuildOptions
- * @property {string} name
- * @property {string} appDir
- * @property {string} htmlPath
- * @property {Array<{path: string} | string>} stylesheets
- * @property {Array<{path: string} | string>} javascripts
- * @property {string[]} assetPaths
- * @property {Record<string, string>=} htmlReplacements
+ * @property {string} name Name of app, used for hosted path (`googlechrome.github.io/lighthouse/{name}/`) and output directory (`dist/gh-pages/{name}`).
+ * @property {string} appDir Path to directory where source lives, used as a base for other paths in options.
+ * @property {Source} html
+ * @property {Record<string, string>=} htmlReplacements Needle -> Replacement mapping, used on html source.
+ * @property {Source[]} stylesheets
+ * @property {Source[]} javascripts
+ * @property {Array<{path: string}>} assets List of paths to copy. Glob-able, maintains directory structure.
  */
 
 /**
@@ -86,7 +92,7 @@ class GhPagesApp {
     const bundledJs = this._compileJs();
     safeWriteFile(`${this.distDir}/src/bundled.js`, bundledJs);
 
-    await cpy(this.opts.assetPaths, this.distDir, {
+    await cpy(this.opts.assets.map(asset => asset.path), this.distDir, {
       cwd: this.opts.appDir,
       parents: true,
     });
@@ -106,10 +112,11 @@ class GhPagesApp {
   }
 
   /**
-   * @param {Array<{path: string} | string>} sources
+   * @param {Source[]} sources
    */
   _resolveSourcesList(sources) {
     const result = [];
+
     for (const source of sources) {
       if (typeof source === 'string') {
         result.push(source);
@@ -117,11 +124,12 @@ class GhPagesApp {
         result.push(...loadFiles(`${this.opts.appDir}/${source.path}`));
       }
     }
+
     return result;
   }
 
   _compileHtml() {
-    let htmlSrc = fs.readFileSync(`${this.opts.appDir}/${this.opts.htmlPath}`, {encoding: 'utf8'});
+    let htmlSrc = this._resolveSourcesList([this.opts.html])[0];
 
     if (this.opts.htmlReplacements) {
       for (const [key, value] of Object.entries(this.opts.htmlReplacements)) {

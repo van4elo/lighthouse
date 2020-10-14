@@ -33,23 +33,23 @@ async function run() {
   const app = new GhPagesApp({
     name: 'viewer',
     appDir: `${__dirname}/../lighthouse-viewer/app`,
+    html: {path: 'index.html'},
     htmlReplacements: {
       '%%LIGHTHOUSE_TEMPLATES%%': htmlReportAssets.REPORT_TEMPLATES,
     },
-    htmlPath: 'index.html',
+    stylesheets: [
+      htmlReportAssets.REPORT_CSS,
+      {path: 'styles/*'},
+    ],
     javascripts: [
       await generatorJsPromise,
       htmlReportAssets.REPORT_JAVASCRIPT,
       fs.readFileSync(require.resolve('idb-keyval/dist/idb-keyval-min.js'), 'utf8'),
       {path: 'src/*'},
     ],
-    stylesheets: [
-      htmlReportAssets.REPORT_CSS,
-      {path: 'styles/*'},
-    ],
-    assetPaths: [
-      'images/**/*',
-      'manifest.json',
+    assets: [
+      {path: 'images/**/*'},
+      {path: 'manifest.json'},
     ],
   });
 
