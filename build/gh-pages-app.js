@@ -58,7 +58,7 @@ function loadFiles(pattern) {
  * @param {string} filePath
  * @param {string} data
  */
-async function safeWriteFile(filePath, data) {
+function safeWriteFile(filePath, data) {
   const fileDir = path.dirname(filePath);
   fs.mkdirSync(fileDir, {recursive: true});
   fs.writeFileSync(filePath, data);
@@ -88,13 +88,13 @@ class GhPagesApp {
       throw minified.error;
     }
 
-    const html = await this._compileHtml();
+    const html = this._compileHtml();
     safeWriteFile(`${this.distDir}/index.html`, html);
 
-    const css = await this._compileCss();
+    const css = this._compileCss();
     safeWriteFile(`${this.distDir}/styles/bundled.css`, css);
 
-    const bundledJs = await this._compileJs();
+    const bundledJs = this._compileJs();
     safeWriteFile(`${this.distDir}/src/bundled.js`, bundledJs);
 
     await cpy(this.opts.assetPaths, this.distDir, {
@@ -116,7 +116,7 @@ class GhPagesApp {
     });
   }
 
-  async _compileHtml() {
+  _compileHtml() {
     let htmlSrc = fs.readFileSync(`${this.opts.appDir}/index.html`, {encoding: 'utf8'});
 
     if (this.opts.htmlReplacements) {
@@ -128,19 +128,19 @@ class GhPagesApp {
     return htmlSrc;
   }
 
-  async _compileCss() {
+  _compileCss() {
     return [
       ...this.opts.stylesheets,
       ...loadFiles(`${this.opts.appDir}/styles/**/*.css`),
     ].join('\n');
   }
 
-  async _compileJs() {
+  _compileJs() {
     // Current Lighthouse version as a global variable.
     const versionJs = `window.LH_CURRENT_VERSION = '${lighthousePackage.version}';`;
 
     // App-specific JS files.
-    const appJsFiles = await loadFiles(`${this.opts.appDir}/src/*.js`);
+    const appJsFiles = loadFiles(`${this.opts.appDir}/src/*.js`);
 
     const contents = [
       `"use strict";`,
