@@ -37,8 +37,9 @@ const license = `/*
  * @typedef BuildOptions
  * @property {string} name
  * @property {string} appDir
- * @property {string[]} javascripts
- * @property {string[]} stylesheets
+ * @property {string} htmlPath
+ * @property {Array<{path: string} | string>} stylesheets
+ * @property {Array<{path: string} | string>} javascripts
  * @property {string[]} assetPaths
  * @property {Record<string, string>=} htmlReplacements
  */
@@ -76,18 +77,6 @@ class GhPagesApp {
   async build() {
     rimraf.sync(this.distDir);
 
-    const contents = [
-      `"use strict";`,
-      ...this.opts.javascripts,
-    ];
-    const options = {
-      output: {preamble: license}, // Insert license at top.
-    };
-    const minified = terser.minify(contents, options);
-    if (minified.error || !minified.code) {
-      throw minified.error;
-    }
-
     const html = this._compileHtml();
     safeWriteFile(`${this.distDir}/index.html`, html);
 
@@ -116,8 +105,23 @@ class GhPagesApp {
     });
   }
 
+  /**
+   * @param {Array<{path: string} | string>} sources
+   */
+  _resolveSourcesList(sources) {
+    const result = [];
+    for (const source of sources) {
+      if (typeof source === 'string') {
+        result.push(source);
+      } else {
+        result.push(...loadFiles(`${this.opts.appDir}/${source.path}`));
+      }
+    }
+    return result;
+  }
+
   _compileHtml() {
-    let htmlSrc = fs.readFileSync(`${this.opts.appDir}/index.html`, {encoding: 'utf8'});
+    let htmlSrc = fs.readFileSync(`${this.opts.appDir}/${this.opts.htmlPath}`, {encoding: 'utf8'});
 
     if (this.opts.htmlReplacements) {
       for (const [key, value] of Object.entries(this.opts.htmlReplacements)) {
@@ -129,24 +133,17 @@ class GhPagesApp {
   }
 
   _compileCss() {
-    return [
-      ...this.opts.stylesheets,
-      ...loadFiles(`${this.opts.appDir}/styles/**/*.css`),
-    ].join('\n');
+    return this._resolveSourcesList(this.opts.stylesheets).join('\n');
   }
 
   _compileJs() {
     // Current Lighthouse version as a global variable.
     const versionJs = `window.LH_CURRENT_VERSION = '${lighthousePackage.version}';`;
 
-    // App-specific JS files.
-    const appJsFiles = loadFiles(`${this.opts.appDir}/src/*.js`);
-
     const contents = [
       `"use strict";`,
       versionJs,
-      ...this.opts.javascripts,
-      ...appJsFiles,
+      ...this._resolveSourcesList(this.opts.javascripts),
     ];
     const options = {
       output: {preamble: license}, // Insert license at top.

@@ -36,13 +36,16 @@ async function run() {
     htmlReplacements: {
       '%%LIGHTHOUSE_TEMPLATES%%': htmlReportAssets.REPORT_TEMPLATES,
     },
+    htmlPath: 'index.html',
     javascripts: [
       await generatorJsPromise,
       htmlReportAssets.REPORT_JAVASCRIPT,
       fs.readFileSync(require.resolve('idb-keyval/dist/idb-keyval-min.js'), 'utf8'),
+      {path: 'src/*'},
     ],
     stylesheets: [
       htmlReportAssets.REPORT_CSS,
+      {path: 'styles/*'},
     ],
     assetPaths: [
       'images/**/*',
