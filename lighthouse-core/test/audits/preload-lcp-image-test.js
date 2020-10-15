@@ -8,19 +8,27 @@
 
 /* eslint-env jest */
 
-const PreloadLCPImage = require('../../audits/preload-lcp-image');
+const PreloadLCPImage = require('../../audits/preload-lcp-image.js');
 
-const pwaTrace = require('../fixtures/traces/progressive-app-m60.json');
-const pwaDevtoolsLog = require('../fixtures/traces/progressive-app-m60.devtools.log.json');
+const lcpTrace = require('../fixtures/traces/lcp-m78.json');
+const lcpDevtoolsLog = require('../fixtures/traces/lcp-m78.devtools.log.json');
 const networkRecordsToDevtoolsLog = require('../network-records-to-devtools-log.js');
 const createTestTrace = require('../create-test-trace.js');
 
-const defaultMainResourceUrl = 'https://www.example.com/';
+const rootNodeUrl = 'http://example.com:3000';
+const mainDocumentNodeUrl = 'http://www.example.com:3000';
+const scriptNodeUrl = 'http://www.example.com/script.js';
+const imageUrl = 'http://www.example.com/image.png';
 
 describe('Performance: preload-lcp audit', () => {
   const mockArtifacts = (networkRecords, finalUrl, imageUrl) => {
     return {
-      traces: {[PreloadLCPImage.DEFAULT_PASS]: createTestTrace({traceEnd: 5000, largestContentfulPaint: 2000})},
+      traces: {
+        [PreloadLCPImage.DEFAULT_PASS]: createTestTrace({
+          traceEnd: 6e3,
+          largestContentfulPaint: 45e2,
+        }),
+      },
       devtoolsLogs: {[PreloadLCPImage.DEFAULT_PASS]: networkRecordsToDevtoolsLog(networkRecords)},
       URL: {finalUrl},
       TraceElements: [
@@ -38,12 +46,8 @@ describe('Performance: preload-lcp audit', () => {
     };
   };
 
-  it('should suggest preloading a lcp image', () => {
-    const rootNodeUrl = 'http://example.com:3000';
-    const mainDocumentNodeUrl = 'http://www.example.com:3000';
-    const scriptNodeUrl = 'http://www.example.com/script.js';
-    const imageUrl = 'http://www.example.com/image.png';
-    const networkRecords = [
+  const mockNetworkRecords = () => {
+    return [
       {
         requestId: '2',
         priority: 'High',
@@ -69,8 +73,8 @@ describe('Performance: preload-lcp audit', () => {
         priority: 'High',
         isLinkPreload: false,
         startTime: 1,
-        endTime: 3,
-        timing: {receiveHeadersEnd: 2000},
+        endTime: 5,
+        timing: {receiveHeadersEnd: 4000},
         url: scriptNodeUrl,
         initiator: {type: 'parser', url: mainDocumentNodeUrl},
       },
@@ -80,17 +84,53 @@ describe('Performance: preload-lcp audit', () => {
         priority: 'High',
         isLinkPreload: false,
         startTime: 2,
-        endTime: 3,
-        timing: {receiveHeadersEnd: 1000},
+        endTime: 4.5,
+        timing: {receiveHeadersEnd: 2500},
         url: imageUrl,
         initiator: {type: 'script', url: scriptNodeUrl},
       },
     ];
+  };
 
+  it('should suggest preloading a lcp image', async () => {
+    const networkRecords = mockNetworkRecords();
     const artifacts = mockArtifacts(networkRecords, mainDocumentNodeUrl, imageUrl);
-    console.log(JSON.stringify(artifacts.traces[PreloadLCPImage.DEFAULT_PASS], null, 4));
     const context = {settings: {}, computedCache: new Map()};
-    const results = PreloadLCPImage.audit(artifacts, context);
-    expect(results.details).toBeDefined();
+    const results = await PreloadLCPImage.audit(artifacts, context);
+    expect(results.numericValue).toEqual(180);
+    expect(results.details.overallSavingsMs).toEqual(180);
+    expect(results.details.items[0].url).toEqual(imageUrl);
+    expect(results.details.items[0].wastedMs).toEqual(180);
+  });
+
+  it('shouldn\'t be applicable if lcp image is not found', async () => {
+    const networkRecords = mockNetworkRecords();
+    const artifacts = mockArtifacts(networkRecords, mainDocumentNodeUrl, imageUrl);
+    artifacts.ImageElements = [];
+    const context = {settings: {}, computedCache: new Map()};
+    const results = await PreloadLCPImage.audit(artifacts, context);
+    expect(results.score).toEqual(1);
+    expect(results.notApplicable).toBeTruthy();
+    expect(results.details).toBeUndefined();
+  });
+
+  it('shouldn\'t be applicable if the lcp is not an image', async () => {
+    const artifacts = {
+      traces: {[PreloadLCPImage.DEFAULT_PASS]: lcpTrace},
+      devtoolsLogs: {[PreloadLCPImage.DEFAULT_PASS]: lcpDevtoolsLog},
+      URL: {finalUrl: 'https://www.paulirish.com/'},
+      TraceElements: [
+        {
+          traceEventType: 'largest-contentful-paint',
+          devtoolsNodePath: '1,HTML,1,BODY,3,DIV,2,P',
+        },
+      ],
+      ImageElements: [],
+    };
+    const context = {settings: {}, computedCache: new Map()};
+    const results = await PreloadLCPImage.audit(artifacts, context);
+    expect(results.score).toEqual(1);
+    expect(results.notApplicable).toBeTruthy();
+    expect(results.details).toBeUndefined();
   });
 });
