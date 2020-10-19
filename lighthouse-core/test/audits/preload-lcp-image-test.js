@@ -9,9 +9,6 @@
 /* eslint-env jest */
 
 const PreloadLCPImage = require('../../audits/preload-lcp-image.js');
-
-const lcpTrace = require('../fixtures/traces/lcp-m78.json');
-const lcpDevtoolsLog = require('../fixtures/traces/lcp-m78.devtools.log.json');
 const networkRecordsToDevtoolsLog = require('../network-records-to-devtools-log.js');
 const createTestTrace = require('../create-test-trace.js');
 
@@ -114,19 +111,21 @@ describe('Performance: preload-lcp audit', () => {
     expect(results.details).toBeUndefined();
   });
 
-  it('shouldn\'t be applicable if the lcp is not an image', async () => {
-    const artifacts = {
-      traces: {[PreloadLCPImage.DEFAULT_PASS]: lcpTrace},
-      devtoolsLogs: {[PreloadLCPImage.DEFAULT_PASS]: lcpDevtoolsLog},
-      URL: {finalUrl: 'https://www.paulirish.com/'},
-      TraceElements: [
-        {
-          traceEventType: 'largest-contentful-paint',
-          devtoolsNodePath: '1,HTML,1,BODY,3,DIV,2,P',
-        },
-      ],
-      ImageElements: [],
-    };
+  it('shouldn\'t be applicable if the lcp is already preloaded', async () => {
+    const networkRecords = mockNetworkRecords();
+    networkRecords[3].isLinkPreload = true;
+    const artifacts = mockArtifacts(networkRecords, mainDocumentNodeUrl, imageUrl);
+    const context = {settings: {}, computedCache: new Map()};
+    const results = await PreloadLCPImage.audit(artifacts, context);
+    expect(results.score).toEqual(1);
+    expect(results.notApplicable).toBeTruthy();
+    expect(results.details).toBeUndefined();
+  });
+
+  it('shouldn\'t be applicable if the lcp request is not from over the network', async () => {
+    const networkRecords = mockNetworkRecords();
+    networkRecords[3].protocol = 'data';
+    const artifacts = mockArtifacts(networkRecords, mainDocumentNodeUrl, imageUrl);
     const context = {settings: {}, computedCache: new Map()};
     const results = await PreloadLCPImage.audit(artifacts, context);
     expect(results.score).toEqual(1);
