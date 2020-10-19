@@ -42,14 +42,11 @@ class PreloadLCPImageAudit extends Audit {
    * @param {LH.Artifacts.NetworkRequest} request
    * @param {LH.Artifacts.NetworkRequest} mainResource
    * @param {Array<LH.Gatherer.Simulation.GraphNode>} initiatorPath
-   * @param {string} lcpImageSource
    * @return {boolean}
    */
-  static shouldPreloadRequest(request, mainResource, initiatorPath, lcpImageSource) {
+  static shouldPreloadRequest(request, mainResource, initiatorPath) {
     const mainResourceDepth = mainResource.redirects ? mainResource.redirects.length : 0;
 
-    // If it's not the request for the LCP image, don't recommend it.
-    if (request.url !== lcpImageSource) return false;
     // If it's already preloaded, no need to recommend it.
     if (request.isLinkPreload) return false;
     // It's not a request loaded over the network, don't recommend it.
@@ -61,13 +58,35 @@ class PreloadLCPImageAudit extends Audit {
   }
 
   /**
+   * @param {LH.Gatherer.Simulation.GraphNode} graph
+   * @param {string} imageUrl
+   * @return {{lcpNode: LH.Gatherer.Simulation.GraphNetworkNode|undefined, path: Array<LH.Gatherer.Simulation.GraphNetworkNode>|undefined}}
+   */
+  static findLCPNode(graph, imageUrl) {
+    let lcpNode;
+    let path;
+    graph.traverse((node, traversalPath) => {
+      if (node.type !== 'network') return;
+      if (node.record.url === imageUrl) {
+        lcpNode = node;
+        path =
+          traversalPath.slice(1).filter(initiator => initiator.type === 'network');
+      }
+    });
+    return {
+      lcpNode,
+      path,
+    };
+  }
+
+  /**
    * @param {LH.Artifacts.NetworkRequest} mainResource
    * @param {LH.Gatherer.Simulation.GraphNode} graph
    * @param {LH.Artifacts.TraceElement|undefined} lcpElement
    * @param {Array<LH.Artifacts.ImageElement>} imageElements
-   * @return {string|undefined}
+   * @return {LH.Gatherer.Simulation.GraphNetworkNode|undefined}
    */
-  static getURLToPreload(mainResource, graph, lcpElement, imageElements) {
+  static getLCPNodeToPreload(mainResource, graph, lcpElement, imageElements) {
     if (!lcpElement) return undefined;
 
     const lcpImageElement = imageElements.find(elem => {
@@ -75,40 +94,30 @@ class PreloadLCPImageAudit extends Audit {
     });
 
     if (!lcpImageElement) return undefined;
-    let lcpUrl;
-    graph.traverse((node, traversalPath) => {
-      if (node.type !== 'network') return;
-      const record = node.record;
-      const imageSource = lcpImageElement.src;
-      // Don't include the node itself or any CPU nodes in the initiatorPath
-      const path = traversalPath.slice(1).filter(initiator => initiator.type === 'network');
-
-      // eslint-disable-next-line max-len
-      if (!PreloadLCPImageAudit.shouldPreloadRequest(record, mainResource, path, imageSource)) return;
-      lcpUrl = record.url;
-    });
-
-    return lcpUrl;
+    const lcpUrl = lcpImageElement.src;
+    const {lcpNode, path} = PreloadLCPImageAudit.findLCPNode(graph, lcpUrl);
+    if (!lcpNode || !path) return undefined;
+    // eslint-disable-next-line max-len
+    const shouldPreload = PreloadLCPImageAudit.shouldPreloadRequest(lcpNode.record, mainResource, path);
+    return shouldPreload ? lcpNode : undefined;
   }
 
   /**
    * Computes the estimated effect of preloading the LCP image.
-   * @param {string} lcpUrl // The image URL of the LCP
+   * @param {LH.Gatherer.Simulation.GraphNetworkNode} lcpNode
    * @param {LH.Gatherer.Simulation.GraphNode} graph
    * @param {LH.Gatherer.Simulation.Simulator} simulator
    * @return {{wastedMs: number, results: Array<{url: string, wastedMs: number}>}}
    */
-  static computeWasteWithGraph(lcpUrl, graph, simulator) {
+  static computeWasteWithGraph(lcpNode, graph, simulator) {
     const simulation = simulator.simulate(graph, {flexibleOrdering: true});
     // For now, we are simply using the duration of the LCP image request as the wastedMS value
-    const timings = Array.from(simulation.nodeTimings.entries());
-    // @ts-ignore
-    const lcpTiming = timings.find(([node, _]) => node.record.url === lcpUrl);
-    const wastedMs = lcpTiming && lcpTiming[1].duration || 0;
+    const lcpTiming = simulation.nodeTimings.get(lcpNode);
+    const wastedMs = lcpTiming && lcpTiming.duration || 0;
     return {
       wastedMs,
       results: [{
-        url: lcpUrl,
+        url: lcpNode.record.url,
         wastedMs,
       }],
     };
@@ -135,8 +144,8 @@ class PreloadLCPImageAudit extends Audit {
 
     const graph = lanternLCP.pessimisticGraph;
     // eslint-disable-next-line max-len
-    const lcpUrl = PreloadLCPImageAudit.getURLToPreload(mainResource, graph, lcpElement, artifacts.ImageElements);
-    if (!lcpUrl) {
+    const lcpNode = PreloadLCPImageAudit.getLCPNodeToPreload(mainResource, graph, lcpElement, artifacts.ImageElements);
+    if (!lcpNode) {
       return {
         score: 1,
         notApplicable: true,
@@ -144,7 +153,7 @@ class PreloadLCPImageAudit extends Audit {
     }
 
     const {results, wastedMs} =
-      PreloadLCPImageAudit.computeWasteWithGraph(lcpUrl, graph, simulator);
+      PreloadLCPImageAudit.computeWasteWithGraph(lcpNode, graph, simulator);
 
     /** @type {LH.Audit.Details.Opportunity['headings']} */
     const headings = [

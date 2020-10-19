@@ -458,7 +458,6 @@ const getNodeDetailsString = `function getNodeDetails(elem) {
     boundingRect: getBoundingClientRect(elem),
     snippet: getOuterHTMLSnippet(elem),
     nodeLabel: getNodeLabel(elem),
-    elementType: elem.tagName.toLowerCase(),
   };
 }`;
 
