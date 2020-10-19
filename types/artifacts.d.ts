@@ -205,8 +205,8 @@ declare global {
       export interface DOMStats {
         /** The total number of elements found within the page's body. */
         totalBodyElements: number;
-        width: {max: number, pathToElement: Array<string>, snippet: string};
-        depth: {max: number, pathToElement: Array<string>, snippet: string};
+        width: {max: number; devtoolsNodePath: string; snippet: string};
+        depth: {max: number; devtoolsNodePath: string; snippet: string};
       }
 
       export interface EmbeddedContentInfo {

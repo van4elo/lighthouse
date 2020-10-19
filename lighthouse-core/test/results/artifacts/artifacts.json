@@ -2395,24 +2395,16 @@
   "AppCacheManifest": "clock.appcache",
   "DOMStats": {
     "depth": {
-      "max": 3,
-      "pathToElement": [
-        "html",
-        "body",
-        "div",
-        "h2"
-      ],
-      "snippet": "<h2>"
+      "max": 4,
+      "devtoolsNodePath": "3,HTML,1,BODY,7,DIV,3,svg,0,title",
+      "snippet": "<title id=\"social-facebook-5\">"
     },
     "width": {
-      "max": 29,
-      "pathToElement": [
-        "html",
-        "body"
-      ],
-      "snippet": "<body>"
+      "max": 100,
+      "devtoolsNodePath": "3,HTML,1,BODY,4,DIV,a,#document-fragment",
+      "snippet": "<div id=\"shadow-root-container\">"
     },
-    "totalBodyElements": 31
+    "totalBodyElements": 148
   },
   "Stacks": [
     {
