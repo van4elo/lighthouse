@@ -19,15 +19,15 @@ const Audit = require('../audit.js');
 const i18n = require('../../lib/i18n/i18n.js');
 
 const UIStrings = {
-  /** Title of a Lighthouse audit that provides detail on various types of issues with the page. This descriptive title is shown to users when no issues were logged into the Chrome DevTools Issues panel. */
+  /** Title of a Lighthouse audit that provides detail on various types of problems with a website, like security or network errors. This descriptive title is shown to users when no issues were logged into the Chrome DevTools Issues panel. */
   title: 'No issues in the `Issues` panel in Chrome Devtools',
-  /** Title of a Lighthouse audit that provides detail on various types of issues with the page. This descriptive title is shown to users when issues are detected and logged into the Chrome DevTools Issues panel. */
+  /** Title of a Lighthouse audit that provides detail on various types of problems with a website, like security or network errors. This descriptive title is shown to users when issues are detected and logged into the Chrome DevTools Issues panel. */
   failureTitle: 'Issues were logged in the `Issues` panel in Chrome Devtools',
   /* eslint-disable max-len */
   /** Description of a Lighthouse audit that tells the user why issues being logged to the Chrome DevTools Issues panel are a cause for concern and so should be fixed. This is displayed after a user expands the section to see more. No character length limits. */
   description: 'Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls, and other browser concerns. Open up the Issues panel in Chrome DevTools for more details on each issue.',
   /* eslint-enable max-len */
-  /** Table column header for the type of issue. */
+  /** Table column header for the types of problems observed in a website, like security or network errors. */
   columnIssueType: 'Issue Type',
   /** The type of an Issue in Chrome DevTools when a resource is blocked due to receiving a rejection in the response to a request made on the page. */
   issueTypeBlockedByResponse: 'Blocked By Response',
@@ -67,11 +67,7 @@ class IssuesPanelEntries extends Audit {
       issueType: 'Mixed Content',
       subItems: {
         type: 'subitems',
-        items: Array.from(requestUrls).map(url => {
-          return {
-            url,
-          };
-        }),
+        items: Array.from(requestUrls).map(url => ({url})),
       },
     };
   }

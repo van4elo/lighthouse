@@ -59,6 +59,7 @@ describe('Has inspector issues audit', () => {
         type: 'subitems',
         items: [
           {
+            // Fell back to `mainResourceURL` since no `request`.
             url: 'www.mixedcontent.com',
           },
           {
