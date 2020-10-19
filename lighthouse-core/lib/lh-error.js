@@ -15,10 +15,15 @@ const UIStrings = {
    * */
   didntCollectScreenshots: `Chrome didn't collect any screenshots during the page load. Please make sure there is content visible on the page, and then try re-running Lighthouse. ({errorCode})`,
   /**
-   * @description Error message explaining that the network trace was not able to be recorded for the Lighthouse run.
+   * @description Error message explaining that the performance trace was not able to be recorded for the Lighthouse run.
    * @example {NO_TRACING_STARTED} errorCode
    * */
   badTraceRecording: 'Something went wrong with recording the trace over your page load. Please run Lighthouse again. ({errorCode})',
+  /**
+   * @description Error message explaining that First Contentful Paint metric was not seen during the page load.
+   * @example {NO_FCP} errorCode
+   * */
+  noFcp: 'No First Contentful Paint was found during load. Please ensure you keep the browser window foreground during the load and try again. ({errorCode})',
   /**
    * @description Error message explaining that the page loaded too slowly to perform a Lighthouse run.
    * @example {FMP_TOO_LATE_FOR_FCPUI} errorCode
@@ -249,7 +254,7 @@ const ERRORS = {
   },
   NO_FCP: {
     code: 'NO_FCP',
-    message: UIStrings.badTraceRecording,
+    message: UIStrings.noFcp,
     lhrRuntimeError: true,
   },
   NO_DCL: {
