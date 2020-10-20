@@ -94,6 +94,7 @@ describe('Has inspector issues audit', () => {
         type: 'subitems',
         items: [
           {
+            // Fell back to `mainResourceURL` since no `request`.
             url: 'www.samesitecookies.com',
           },
           {
@@ -149,6 +150,7 @@ describe('Has inspector issues audit', () => {
       },
       subItems: {
         type: 'subitems',
+        // should only be 4 subitems as one of the issues doesn't have a request url
         items: [
           {
             url: 'www.coep.com',

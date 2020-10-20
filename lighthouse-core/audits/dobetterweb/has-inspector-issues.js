@@ -28,11 +28,11 @@ const UIStrings = {
   description: 'Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls, and other browser concerns. Open up the Issues panel in Chrome DevTools for more details on each issue.',
   /* eslint-enable max-len */
   /** Table column header for the types of problems observed in a website, like security or network errors. */
-  columnIssueType: 'Issue Type',
+  columnIssueType: 'Issue type',
   /** The type of an Issue in Chrome DevTools when a resource is blocked due to receiving a rejection in the response to a request made on the page. */
-  issueTypeBlockedByResponse: 'Blocked By Response',
+  issueTypeBlockedByResponse: 'Blocked by response',
   /** The type of an Issue in Chrome DevTools when a site has large ads that use up a lot of the browser's resources. */
-  issueTypeHeavyAds: 'Heavy Ads',
+  issueTypeHeavyAds: 'Heavy resource usage by ads',
 };
 
 const str_ = i18n.createMessageInstanceIdFn(__filename, UIStrings);

@@ -666,7 +666,7 @@
     "message": "Avoids requesting the geolocation permission on page load"
   },
   "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | columnIssueType": {
-    "message": "Issue Type"
+    "message": "Issue type"
   },
   "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | description": {
     "message": "Issues logged to the `Issues` panel in Chrome Devtools indicate unresolved problems. They can come from network request failures, insufficient security controls, and other browser concerns. Open up the Issues panel in Chrome DevTools for more details on each issue."
@@ -675,10 +675,10 @@
     "message": "Issues were logged in the `Issues` panel in Chrome Devtools"
   },
   "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | issueTypeBlockedByResponse": {
-    "message": "Blocked By Response"
+    "message": "Blocked by response"
   },
   "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | issueTypeHeavyAds": {
-    "message": "Heavy Ads"
+    "message": "Heavy resource usage by ads"
   },
   "lighthouse-core/audits/dobetterweb/has-inspector-issues.js | title": {
     "message": "No issues in the `Issues` panel in Chrome Devtools"
